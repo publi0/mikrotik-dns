@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DNS Analytics Dashboard</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            .tab-button.active {
+                background-color: #3b82f6;
+                color: white;
+            }
+            .progress-bar {
+                transition: width 0.3s ease;
+            }
+            .modal {
+                display: none;
+            }
+            .modal.active {
+                display: flex;
+            }
+            .loading {
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .hover-card:hover {
+                background-color: #f3f4f6;
+            }
+            .blocked-domain:hover {
+                background-color: #fecaca;
+            }
+            .client-item:hover {
+                background-color: #dbeafe;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen bg-gray-50 p-6">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        DNS Analytics Dashboard
+                    </h1>
+                    <div
+                        class="flex items-center gap-4 text-gray-600 flex-wrap"
+                    >
+                        <span
+                            >MikroTik DNS Query Analytics - Last 24 Hours</span
+                        >
+                        <span class="text-sm" id="lastUpdated"></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <div class="flex items-center gap-2 text-sm">
+                        <label class="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="autoRefresh"
+                                checked
+                                class="rounded"
+                            />
+                            Auto-refresh
+                        </label>
+                        <select
+                            id="refreshInterval"
+                            class="px-2 py-1 border rounded text-sm"
+                        >
+                            <option value="5">5s</option>
+                            <option value="10">10s</option>
+                            <option value="30">30s</option>
+                            <option value="60">1min</option>
+                            <option value="300">5min</option>
+                        </select>
+                    </div>
+                    <button
+                        id="refreshBtn"
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        <svg
+                            id="refreshIcon"
+                            class="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            ></path>
+                        </svg>
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">
+                                Total Queries
+                            </p>
+                            <p class="text-2xl font-bold" id="totalQueries">
+                                0
+                            </p>
+                            <p class="text-xs text-gray-500">Last 24 hours</p>
+                        </div>
+                        <svg
+                            class="h-8 w-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                            ></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">
+                                Blocked Queries
+                            </p>
+                            <p
+                                class="text-2xl font-bold text-red-600"
+                                id="blockedPercentage"
+                            >
+                                0%
+                            </p>
+                            <p class="text-xs text-gray-500" id="blockedCount">
+                                0 blocked
+                            </p>
+                        </div>
+                        <svg
+                            class="h-8 w-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                            ></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">
+                                Active Clients
+                            </p>
+                            <p class="text-2xl font-bold" id="activeClients">
+                                0
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Unique IP addresses
+                            </p>
+                        </div>
+                        <svg
+                            class="h-8 w-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                            ></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">
+                                Unique Domains
+                            </p>
+                            <p class="text-2xl font-bold" id="uniqueDomains">
+                                0
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Different domains queried
+                            </p>
+                        </div>
+                        <svg
+                            class="h-8 w-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+                            ></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6">
+                        <button
+                            class="tab-button active py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600"
+                            data-tab="overview"
+                        >
+                            Overview
+                        </button>
+                        <button
+                            class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700"
+                            data-tab="domains"
+                        >
+                            Domains
+                        </button>
+                        <button
+                            class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700"
+                            data-tab="clients"
+                        >
+                            Clients
+                        </button>
+                        <button
+                            class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700"
+                            data-tab="security"
+                        >
+                            Security
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Overview Tab -->
+                <div id="overview" class="tab-content active p-6 space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Query Types Chart -->
+                        <div class="bg-white border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-2">
+                                Query Types Distribution
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                DNS query types in the last 24 hours
+                            </p>
+                            <div id="queryTypesChart" class="space-y-3"></div>
+                        </div>
+
+                        <!-- Top Domains -->
+                        <div class="bg-white border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-2">
+                                Top Domains
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Most queried domains
+                            </p>
+                            <div
+                                id="topDomainsOverview"
+                                class="space-y-2 max-h-80 overflow-y-auto"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Top Blocked Domains -->
+                    <div class="bg-white border rounded-lg p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg
+                                class="h-5 w-5 text-red-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                ></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold">
+                                Top Blocked Domains
+                            </h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Most frequently blocked domains in the last 24 hours
+                        </p>
+                        <div
+                            id="blockedDomainsOverview"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Domains Tab -->
+                <div id="domains" class="tab-content p-6 space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-2">
+                                Top 20 Domains
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Most frequently queried domains
+                            </p>
+                            <div
+                                id="topDomainsList"
+                                class="space-y-2 max-h-96 overflow-y-auto"
+                            ></div>
+                        </div>
+
+                        <div class="bg-white border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-2">
+                                Domain Query Visualization
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Visual representation of query volumes
+                            </p>
+                            <div
+                                id="domainVisualization"
+                                class="space-y-3"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clients Tab -->
+                <div id="clients" class="tab-content p-6 space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-2">
+                                Top Clients
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Most active IP addresses
+                            </p>
+                            <div
+                                id="topClientsList"
+                                class="space-y-2 max-h-96 overflow-y-auto"
+                            ></div>
+                        </div>
+
+                        <div class="bg-white border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-2">
+                                Client Query Details
+                            </h3>
+                            <p
+                                class="text-gray-600 text-sm mb-4"
+                                id="clientDetailsTitle"
+                            >
+                                Select a client to view details
+                            </p>
+                            <div id="clientDetails">
+                                <div class="text-center text-gray-500 py-8">
+                                    Click on a client IP address to view their
+                                    query history
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div id="security" class="tab-content p-6">
+                    <div class="bg-white border rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-2">
+                            Blocked Domains
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Domains marked as UNKNOWN (potentially malicious)
+                        </p>
+                        <div
+                            id="blockedDomainsList"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unblock Domain Modal -->
+        <div
+            id="unblockModal"
+            class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50"
+        >
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Unblock Domain</h3>
+                    <button
+                        id="closeModal"
+                        class="text-gray-400 hover:text-gray-600"
+                    >
+                        <svg
+                            class="h-6 w-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">
+                        To unblock <strong id="selectedDomain"></strong>, run
+                        this command on your MikroTik router:
+                    </p>
+
+                    <div
+                        class="bg-gray-100 p-3 rounded font-mono text-sm break-all"
+                        id="mikrotikCommand"
+                    ></div>
+
+                    <div class="flex gap-2">
+                        <button
+                            id="copyCommand"
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Copy Command
+                        </button>
+                        <button
+                            id="closeModalBtn"
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                        >
+                            Close
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-gray-500">
+                        This will create a DNS static entry that forwards the
+                        domain to allow normal resolution.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
