@@ -1,33 +1,31 @@
-
-# Use the official Go image as a parent image
 FROM golang:1.24-alpine AS builder
-
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the Go module and sum files
-COPY go.mod go.sum ./
+# Dependências de build para CGO + SQLite
+RUN apk add --no-cache gcc musl-dev sqlite-dev
 
-# Download Go module dependencies
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the rest of the application source code
 COPY . .
 
-# Build the Go application for a static build
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /mikrotik-dns .
+# Build com CGO ativado
+RUN CGO_ENABLED=1 go build -o /mikrotik-dns .
 
-# Use a minimal image for the final stage
+# Stage runtime mínimo (apenas binário + assets)
 FROM alpine:latest
+WORKDIR /
 
-# Copy the static binary from the builder stage
+# SQLite para o binário e assets da página
+RUN apk add --no-cache sqlite-libs
+
 COPY --from=builder /mikrotik-dns /mikrotik-dns
+COPY --from=builder /app/page /page
 
-# Copy the web page assets
-COPY ./page /page
+# Crie a pasta para o banco de dados, se necessário
+RUN mkdir -p /data
 
-# Expose port 8989 to the outside world
 EXPOSE 8080
+EXPOSE 5354
 
-# Command to run the executable
-ENTRYPOINT ["/mikrotik-dns"]
+CMD ["/mikrotik-dns"]

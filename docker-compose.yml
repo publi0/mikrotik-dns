@@ -4,6 +4,11 @@ services:
     restart: unless-stopped
     build: .
     ports:
-      - "8080:8080"
+      - "5354:5354/udp"
     volumes:
       - ./data:/app/data
+    networks:
+      - internal
+networks:
+  internal:
+    external: true

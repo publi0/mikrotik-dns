@@ -80,13 +80,17 @@ func serveAPI(db *sql.DB) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/top-domains", func(w http.ResponseWriter, r *http.Request) {
-		rows, _ := db.Query(`
+		rows, err := db.Query(`
             SELECT domain, COUNT(*) as cnt
             FROM queries
             WHERE blocked=0 AND timestamp >= strftime('%s','now')-86400
             GROUP BY domain
             ORDER BY cnt DESC
             LIMIT 20`)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
 		defer rows.Close()
 		var out []struct {
 			Domain string `json:"domain"`
@@ -105,11 +109,15 @@ func serveAPI(db *sql.DB) {
 	})
 
 	mux.HandleFunc("/api/query-types", func(w http.ResponseWriter, r *http.Request) {
-		rows, _ := db.Query(`
+		rows, err := db.Query(`
             SELECT type, COUNT(*)
             FROM queries
             WHERE timestamp >= strftime('%s','now')-86400
             GROUP BY type`)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
 		defer rows.Close()
 		var out []struct {
 			Type  string `json:"type"`
@@ -128,13 +136,17 @@ func serveAPI(db *sql.DB) {
 	})
 
 	mux.HandleFunc("/api/blocked-domains", func(w http.ResponseWriter, r *http.Request) {
-		rows, _ := db.Query(`
+		rows, err := db.Query(`
             SELECT domain, COUNT(*) as cnt
             FROM queries
             WHERE blocked=1 AND timestamp >= strftime('%s','now')-86400
             GROUP BY domain
             ORDER BY cnt DESC
             LIMIT 20`)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
 		defer rows.Close()
 		var out []struct {
 			Domain string `json:"domain"`
@@ -153,13 +165,17 @@ func serveAPI(db *sql.DB) {
 	})
 
 	mux.HandleFunc("/api/clients", func(w http.ResponseWriter, r *http.Request) {
-		rows, _ := db.Query(`
+		rows, err := db.Query(`
             SELECT client, COUNT(*) as cnt
             FROM queries
             WHERE timestamp >= strftime('%s','now')-86400
             GROUP BY client
             ORDER BY cnt DESC
             LIMIT 20`)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
 		defer rows.Close()
 		var out []struct {
 			Client string `json:"client"`
@@ -197,12 +213,16 @@ func serveAPI(db *sql.DB) {
 		}
 		offset := (page - 1) * pageSize
 
-		rows, _ := db.Query(`
+		rows, err := db.Query(`
             SELECT timestamp, domain, type, blocked
             FROM queries
             WHERE client = ? AND timestamp >= strftime('%s','now')-86400
             ORDER BY timestamp DESC
             LIMIT ? OFFSET ?`, client, pageSize, offset)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
 		defer rows.Close()
 
 		var out []struct {
