@@ -1,7 +1,9 @@
-# mikrotik-dns-dashboard
+# Mikrotik Dns Dashboard
 
 A lightweight self-hosted dashboard for visualizing DNS queries from your MikroTik router.
 It receives DNS query logs via UDP from a MikroTik device and stores/analyzes them using SQLite, exposing a web dashboard with statistics via a web interface.
+
+<img width="1920" height="1213" alt="image" src="https://github.com/user-attachments/assets/5cc9de12-c36c-40c5-9e6c-907f4727a711" />
 
 ---
 
