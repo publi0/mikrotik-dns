@@ -10,6 +10,7 @@ const dashboardData = {
   autoRefresh: true,
   refreshInterval: 5,
   lastUpdated: null,
+  isInitialLoad: true,
 };
 let refreshTimer = null;
 const API_ENDPOINTS = {
@@ -19,13 +20,20 @@ const API_ENDPOINTS = {
   clients: "/api/clients",
   clientQueries: "/api/client-queries",
 };
+
 document.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("initial-load");
   initializeEventListeners();
-  initializeDarkMode();
   fetchAllData();
   setupAutoRefresh();
   lucide.createIcons();
+
+  setTimeout(() => {
+    document.body.classList.remove("initial-load");
+    dashboardData.isInitialLoad = false;
+  }, 2000);
 });
+
 function initializeEventListeners() {
   document.querySelectorAll(".tab-button").forEach((button) => {
     button.addEventListener("click", function () {
@@ -33,9 +41,6 @@ function initializeEventListeners() {
     });
   });
   document.getElementById("refreshBtn").addEventListener("click", fetchAllData);
-  document
-    .getElementById("darkModeToggle")
-    .addEventListener("click", toggleDarkMode);
   document
     .getElementById("autoRefresh")
     .addEventListener("change", function () {
@@ -62,67 +67,52 @@ function initializeEventListeners() {
     });
 }
 
-function initializeDarkMode() {
-  const isDarkMode =
-    localStorage.getItem("darkMode") === "true" ||
-    (!localStorage.getItem("darkMode") &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  if (isDarkMode) {
-    document.documentElement.classList.add("dark");
-  }
-
-  updateDarkModeToggle();
-}
-
-function toggleDarkMode() {
-  const isDark = document.documentElement.classList.toggle("dark");
-  localStorage.setItem("darkMode", isDark);
-  updateDarkModeToggle();
-
-  // Add a subtle animation to the toggle
-  const toggle = document.getElementById("darkModeToggle");
-  toggle.style.transform = "scale(0.95)";
-  setTimeout(() => {
-    toggle.style.transform = "scale(1)";
-  }, 150);
-}
-
-function updateDarkModeToggle() {
-  const toggle = document.getElementById("darkModeToggle");
-  const isDark = document.documentElement.classList.contains("dark");
-  const span = toggle.querySelector("span");
-
-  span.textContent = isDark ? "Light" : "Dark";
-}
-
 function switchTab(tabName) {
-  // Add fade out animation to current tab
-  const currentTab = document.querySelector(".tab-content.active");
-  if (currentTab) {
-    currentTab.style.opacity = "0";
-    currentTab.style.transform = "translateY(10px)";
-  }
+  const allTabs = document.querySelectorAll(".tab-content");
+  const allButtons = document.querySelectorAll(".tab-button");
 
-  document.querySelectorAll(".tab-button").forEach((button) => {
+  // Remove active state de todos
+  allTabs.forEach((tab) => {
+    tab.classList.remove("active");
+    tab.style.opacity = "0";
+    tab.style.transform = "translateY(10px)";
+  });
+  allButtons.forEach((button) => {
     button.classList.remove("active", "bg-blue-600", "text-white", "shadow");
-    button.classList.add("text-gray-500", "dark:text-gray-400");
-  });
-  document
-    .querySelector(`[data-tab="${tabName}"]`)
-    .classList.add("active", "bg-blue-600", "text-white", "shadow");
-  document
-    .querySelector(`[data-tab="${tabName}"]`)
-    .classList.remove("text-gray-500", "dark:text-gray-400");
-  document.querySelectorAll(".tab-content").forEach((content) => {
-    content.classList.remove("active");
+    button.classList.add("text-gray-400");
   });
 
-  // Add fade in animation to new tab
+  // Ativa o botão clicado
+  const btn = document.querySelector(`[data-tab="${tabName}"]`);
+  btn.classList.add("active", "bg-blue-600", "text-white", "shadow");
+  btn.classList.remove("text-gray-400");
+
+  // Aguarda um pequeno tempo para garantir display:block e animação
   setTimeout(() => {
-    document.getElementById(tabName).classList.add("active");
-  }, 150);
+    const newTab = document.getElementById(tabName);
+    newTab.classList.add("active");
+    newTab.style.opacity = "1";
+    newTab.style.transform = "translateY(0)";
+
+    // Só depois que ativou a aba, atualize o conteúdo da view
+    setTimeout(() => {
+      if (tabName === "overview") {
+        updateTopDomainsOverview();
+        updateBlockedDomainsOverview();
+        updateQueryTypesChart();
+      } else if (tabName === "domains") {
+        updateTopDomainsList();
+        updateDomainVisualization();
+      } else if (tabName === "clients") {
+        updateTopClientsList();
+        updateClientDetails();
+      } else if (tabName === "security") {
+        updateBlockedDomainsList();
+      }
+    }, 350); // igual ou maior que o tempo de transição CSS (0.3s)
+  }, 50); // delay pequeno para garantir que display:block já foi aplicado
 }
+
 async function fetchAllData() {
   if (dashboardData.loading) return;
   dashboardData.loading = true;
@@ -147,6 +137,7 @@ async function fetchAllData() {
     updateLoadingState(false);
   }
 }
+
 async function fetchClientQueries(client, page = 1) {
   try {
     const response = await fetch(
@@ -160,6 +151,7 @@ async function fetchClientQueries(client, page = 1) {
     console.error("Failed to fetch client queries:", error);
   }
 }
+
 function updateLoadingState(loading) {
   const refreshIcon = document.getElementById("refreshIcon");
   const refreshBtn = document.getElementById("refreshBtn");
@@ -171,6 +163,7 @@ function updateLoadingState(loading) {
     refreshBtn.disabled = false;
   }
 }
+
 function updateAllViews() {
   updateStatsCards();
   updateQueryTypesChart();
@@ -182,6 +175,7 @@ function updateAllViews() {
   updateBlockedDomainsList();
   updateLastUpdatedTime();
 }
+
 function updateStatsCards() {
   const totalQueries = dashboardData.queryTypes.reduce(
     (sum, item) => sum + item.count,
@@ -192,7 +186,6 @@ function updateStatsCards() {
   const blockedPercentage =
     totalQueries > 0 ? ((blockedQueries / totalQueries) * 100).toFixed(1) : "0";
 
-  // Animate counter updates
   animateCounter("totalQueries", totalQueries);
   animateCounter("blockedPercentage", blockedPercentage, "%");
   animateCounter("activeClients", dashboardData.clients.length);
@@ -222,6 +215,7 @@ function animateCounter(elementId, targetValue, suffix = "") {
     element.textContent = current.toLocaleString() + suffix;
   }, 50);
 }
+
 function updateQueryTypesChart() {
   const container = document.getElementById("queryTypesChart");
   const totalQueries = dashboardData.queryTypes.reduce(
@@ -229,114 +223,177 @@ function updateQueryTypesChart() {
     0,
   );
   container.innerHTML = dashboardData.queryTypes
-    .map((item, index) => {
+    .map((item) => {
+      let color;
+      let bgColor;
+      if (item.type === "AAAA") {
+        color = "#22c55e"; // green-500
+        bgColor = "bg-green-600";
+      } else if (item.type === "A") {
+        color = "#f59e42"; // orange-500
+        bgColor = "bg-orange-500";
+      } else if (item.type === "UNKNOWN") {
+        color = "#ef4444"; // red-500
+        bgColor = "bg-red-600";
+      } else {
+        color = "#818cf8"; // indigo-400 (default)
+        bgColor = "bg-indigo-600";
+      }
       const percentage =
         totalQueries > 0 ? ((item.count / totalQueries) * 100).toFixed(1) : "0";
-      const color = `hsl(${index * 45}, 70%, 50%)`;
-      return `<div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-4 h-4 rounded" style="background-color: ${color}"></div><span class="font-medium">${item.type}</span></div><div class="text-right"><div class="font-bold">${item.count.toLocaleString()}</div><div class="text-xs text-gray-500">${percentage}%</div></div></div>`;
+      return `<div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-4 h-4 rounded" style="background-color: ${color}"></div>
+          <span class="font-medium text-white">${item.type}</span>
+        </div>
+        <div class="text-right">
+          <div class="font-bold text-white">${item.count.toLocaleString()}</div>
+          <div class="text-xs text-gray-400">${percentage}%</div>
+        </div>
+      </div>`;
     })
     .join("");
 }
+
 function updateTopDomainsOverview() {
   const container = document.getElementById("topDomainsOverview");
+  const useStagger = dashboardData.isInitialLoad;
   const content = dashboardData.topDomains
     .slice(0, 10)
     .map(
       (item, index) =>
-        `<div class="flex items-center justify-between p-2 rounded hover-card stagger-item" style="animation-delay: ${index * 0.1}s"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 dark:text-gray-400">#${index + 1}</span><span class="font-medium text-gray-900 dark:text-white">${item.domain}</span></div><span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded">${item.count}</span></div>`,
+        `<div class="flex items-center justify-between p-2 rounded hover-card ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.1}s"` : ""}><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-400">#${index + 1}</span><span class="font-medium text-white">${item.domain}</span></div><span class="px-2 py-1 bg-gray-700 text-gray-200 text-xs rounded">${item.count}</span></div>`,
     )
     .join("");
 
   container.innerHTML = content;
 }
+
 function updateBlockedDomainsOverview() {
   const container = document.getElementById("blockedDomainsOverview");
+  const useStagger = dashboardData.isInitialLoad;
   const content = dashboardData.blockedDomains
     .slice(0, 12)
     .map(
       (item, index) =>
-        `<div class="flex items-center justify-between p-3 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-900/20 blocked-domain cursor-pointer transition-colors stagger-item" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain" style="animation-delay: ${index * 0.05}s"><div class="flex items-center gap-2 min-w-0"><span class="text-xs font-mono text-red-500 dark:text-red-400 flex-shrink-0">#${index + 1}</span><span class="font-medium text-red-900 dark:text-red-100 truncate" title="${item.domain}">${item.domain}</span></div><span class="px-2 py-1 bg-red-600 dark:bg-red-500 text-white text-xs rounded flex-shrink-0">${item.count}</span></div>`,
+        `<div class="flex items-center justify-between p-3 border border-red-800 rounded-lg bg-red-900/20 blocked-domain cursor-pointer transition-colors ${useStagger ? "stagger-item" : ""}" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain" ${useStagger ? `style="animation-delay: ${index * 0.05}s"` : ""}><div class="flex items-center gap-2 min-w-0"><span class="text-xs font-mono text-red-400 flex-shrink-0">#${index + 1}</span><span class="font-medium text-red-100 truncate" title="${item.domain}">${item.domain}</span></div><span class="px-2 py-1 bg-red-500 text-white text-xs rounded flex-shrink-0">${item.count}</span></div>`,
     )
     .join("");
 
   container.innerHTML = content;
 }
+
 function updateTopDomainsList() {
   const container = document.getElementById("topDomainsList");
+  const useStagger = dashboardData.isInitialLoad;
   const content = dashboardData.topDomains
     .map(
       (item, index) =>
-        `<div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-all duration-200 stagger-item" style="animation-delay: ${index * 0.02}s"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 dark:text-gray-400 w-8">#${index + 1}</span><span class="font-medium text-gray-900 dark:text-white">${item.domain}</span></div><span class="px-2 py-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs rounded">${item.count} queries</span></div>`,
+        `<div class="flex items-center justify-between p-3 border border-gray-700 rounded-lg hover:shadow-md transition-all duration-200 ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.02}s"` : ""}><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-400 w-8">#${index + 1}</span><span class="font-medium text-white">${item.domain}</span></div><span class="px-2 py-1 border border-gray-600 text-gray-300 text-xs rounded">${item.count} queries</span></div>`,
     )
     .join("");
 
   container.innerHTML = content;
 }
+
 function updateDomainVisualization() {
   const container = document.getElementById("domainVisualization");
   const maxCount = dashboardData.topDomains[0]?.count || 1;
+  const useStagger = dashboardData.isInitialLoad;
   const content = dashboardData.topDomains
     .slice(0, 10)
     .map((item, index) => {
       const percentage = (item.count / maxCount) * 100;
-      return `<div class="space-y-1 stagger-item" style="animation-delay: ${index * 0.1}s"><div class="flex justify-between text-sm"><span class="truncate text-gray-900 dark:text-white">${item.domain}</span><span class="font-mono text-gray-600 dark:text-gray-400">${item.count}</span></div><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2"><div class="bg-blue-600 dark:bg-blue-500 h-2 rounded-full progress-bar" style="width: ${percentage}%; animation-delay: ${index * 0.1 + 0.5}s"></div></div></div>`;
+      return `<div class="space-y-1 ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.1}s"` : ""}><div class="flex justify-between text-sm"><span class="truncate text-white">${item.domain}</span><span class="font-mono text-gray-400">${item.count}</span></div><div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full progress-bar" style="width: ${percentage}%; ${useStagger ? `animation-delay: ${index * 0.1 + 0.5}s` : ""}"></div></div></div>`;
     })
     .join("");
 
   container.innerHTML = content;
 }
+
 function updateTopClientsList() {
   const container = document.getElementById("topClientsList");
+  const useStagger = dashboardData.isInitialLoad;
   const content = dashboardData.clients
     .map(
       (item, index) =>
-        `<div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer client-item transition-colors stagger-item" onclick="selectClient('${item.client}')" style="animation-delay: ${index * 0.05}s"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 dark:text-gray-400 w-8">#${index + 1}</span><span class="font-mono text-gray-900 dark:text-white">${item.client}</span></div><span class="px-2 py-1 ${dashboardData.selectedClient === item.client ? "bg-blue-600 text-white" : "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"} text-xs rounded">${item.count} queries</span></div>`,
+        `<div class="flex items-center justify-between p-3 border border-gray-700 rounded-lg cursor-pointer client-item transition-colors ${useStagger ? "stagger-item" : ""}" onclick="selectClient('${item.client}')" ${useStagger ? `style="animation-delay: ${index * 0.05}s"` : ""}><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-400 w-8">#${index + 1}</span><span class="font-mono text-white">${item.client}</span></div><span class="px-2 py-1 ${dashboardData.selectedClient === item.client ? "bg-blue-600 text-white" : "border border-gray-600 text-gray-300"} text-xs rounded">${item.count} queries</span></div>`,
     )
     .join("");
 
   container.innerHTML = content;
 }
+
 function updateBlockedDomainsList() {
   const container = document.getElementById("blockedDomainsList");
+  const useStagger = dashboardData.isInitialLoad;
   const content = dashboardData.blockedDomains
     .map(
       (item, index) =>
-        `<div class="p-4 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-900/20 cursor-pointer blocked-domain transition-colors stagger-item" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain" style="animation-delay: ${index * 0.05}s"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><i data-lucide="shield-off" class="h-4 w-4 text-red-600 dark:text-red-400"></i><span class="font-medium text-red-900 dark:text-red-100">${item.domain}</span></div><span class="px-2 py-1 bg-red-600 dark:bg-red-500 text-white text-xs rounded">${item.count}</span></div><p class="text-xs text-red-600 dark:text-red-400 mt-1">Blocked ${item.count} times</p></div>`,
+        `<div class="p-4 border border-red-800 rounded-lg bg-red-900/20 cursor-pointer blocked-domain transition-colors ${useStagger ? "stagger-item" : ""}" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain" ${useStagger ? `style="animation-delay: ${index * 0.05}s"` : ""}><div class="flex items-center justify-between"><div class="flex items-center gap-2"><i data-lucide="shield-off" class="h-4 w-4 text-red-400"></i><span class="font-medium text-red-100">${item.domain}</span></div><span class="px-2 py-1 bg-red-500 text-white text-xs rounded">${item.count}</span></div><p class="text-xs text-red-400 mt-1">Blocked ${item.count} times</p></div>`,
     )
     .join("");
 
   container.innerHTML = content;
-
-  // Re-initialize Lucide icons for the new content
   lucide.createIcons();
 }
+
 function selectClient(client) {
   fetchClientQueries(client, 1);
 }
+
 function updateClientDetails() {
   const container = document.getElementById("clientDetails");
   const titleElement = document.getElementById("clientDetailsTitle");
   if (!dashboardData.selectedClient) {
-    container.innerHTML = `<div class="text-center text-gray-500 dark:text-gray-400 py-8">Click on a client IP address to view their query history</div>`;
+    container.innerHTML = `<div class="text-center text-gray-400 py-8">Click on a client IP address to view their query history</div>`;
     titleElement.textContent = "Select a client to view details";
     return;
   }
   titleElement.textContent = `Queries from ${dashboardData.selectedClient}`;
-  container.innerHTML = `<div class="space-y-4"><div class="flex items-center gap-2"><input type="text" value="${dashboardData.selectedClient}" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded font-mono text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onchange="selectClient(this.value)"><button onclick="selectClient(document.querySelector('#clientDetails input').value)" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transform hover:scale-105 transition-all duration-200"><i data-lucide="search" class="h-4 w-4"></i></button></div><div class="space-y-2 max-h-80 overflow-y-auto">${dashboardData.clientQueries.map((query, index) => `<div class="flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded text-sm hover:shadow-sm transition-all duration-200 stagger-item" style="animation-delay: ${index * 0.02}s"><div class="flex items-center gap-3"><span class="font-mono text-gray-500 dark:text-gray-400">${formatTimestamp(query.timestamp)}</span><span class="font-medium text-gray-900 dark:text-white">${query.domain}</span></div><div class="flex items-center gap-2"><span class="px-2 py-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs rounded">${query.type}</span>${query.blocked === 1 ? '<span class="px-2 py-1 bg-red-600 dark:bg-red-500 text-white text-xs rounded">BLOCKED</span>' : ""}</div></div>`).join("")}</div><div class="flex justify-center gap-2"><button onclick="changePage(-1)" ${dashboardData.currentPage === 1 ? "disabled" : ""} class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-all duration-200">Previous</button><span class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">Page ${dashboardData.currentPage}</span><button onclick="changePage(1)" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all duration-200">Next</button></div></div>`;
+  const useStagger = dashboardData.isInitialLoad;
+  container.innerHTML = `<div class="space-y-4"><div class="flex items-center gap-2"><input type="text" value="${dashboardData.selectedClient}" class="flex-1 px-3 py-2 border border-gray-600 rounded font-mono text-sm bg-gray-700 text-white" onchange="selectClient(this.value)"><button onclick="selectClient(document.querySelector('#clientDetails input').value)" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transform hover:scale-105 transition-all duration-200"><i data-lucide="search" class="h-4 w-4"></i></button></div><div class="space-y-2 max-h-80 overflow-y-auto">${dashboardData.clientQueries
+    .map(
+      (
+        query,
+        index,
+      ) => `<div class="flex items-center justify-between p-2 border border-gray-700 rounded text-sm hover:shadow-sm transition-all duration-200 ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.02}s"` : ""}><div class="flex items-center gap-3"><span class="font-mono text-gray-400">${formatTimestamp(query.timestamp)}</span><span class="font-medium text-white">${query.domain}</span></div><div class="flex items-center gap-2"><span class="px-2 py-1 text-xs rounded font-mono"
+    style="
+      background-color: ${
+        query.type === "AAAA"
+          ? "#22c55e"
+          : query.type === "A"
+            ? "#f59e42"
+            : query.type === "UNKNOWN"
+              ? "#ef4444"
+              : "#6366f1"
+      };
+      color: white;
+    "
+  >
+    ${query.type}
+  </span>
+${query.blocked === 1 ? '<span class="px-2 py-1 bg-red-500 text-white text-xs rounded">BLOCKED</span>' : ""}</div></div>`,
+    )
+    .join(
+      "",
+    )}</div><div class="flex justify-center gap-2"><button onclick="changePage(-1)" ${dashboardData.currentPage === 1 ? "disabled" : ""} class="px-3 py-1 border border-gray-600 rounded text-sm hover:bg-gray-700 disabled:opacity-50 text-gray-300 transition-all duration-200">Previous</button><span class="px-3 py-1 text-sm text-gray-300">Page ${dashboardData.currentPage}</span><button onclick="changePage(1)" class="px-3 py-1 border border-gray-600 rounded text-sm hover:bg-gray-700 text-gray-300 transition-all duration-200">Next</button></div></div>`;
 
-  // Re-initialize Lucide icons for the new content
   lucide.createIcons();
 }
+
 function changePage(direction) {
   const newPage = Math.max(1, dashboardData.currentPage + direction);
   fetchClientQueries(dashboardData.selectedClient, newPage);
 }
+
 function updateLastUpdatedTime() {
   const element = document.getElementById("lastUpdated");
   if (dashboardData.lastUpdated) {
     element.textContent = `Last updated: ${dashboardData.lastUpdated.toLocaleTimeString()}`;
   }
 }
+
 function setupAutoRefresh() {
   if (refreshTimer) {
     clearInterval(refreshTimer);
@@ -349,9 +406,11 @@ function setupAutoRefresh() {
     );
   }
 }
+
 function formatTimestamp(timestamp) {
   return new Date(timestamp * 1000).toLocaleString();
 }
+
 function openUnblockModal(domain) {
   document.getElementById("selectedDomain").textContent = domain;
   document.getElementById("mikrotikCommand").textContent =
@@ -359,12 +418,15 @@ function openUnblockModal(domain) {
   document.getElementById("unblockModal").classList.add("active");
   lucide.createIcons();
 }
+
 function closeModal() {
   document.getElementById("unblockModal").classList.remove("active");
 }
+
 function generateMikroTikCommand(domain) {
   return `/ip/dns/static add name="${domain}" type=FWD match-subdomain=yes`;
 }
+
 async function copyToClipboard() {
   const command = document.getElementById("mikrotikCommand").textContent;
   const button = document.getElementById("copyCommand");

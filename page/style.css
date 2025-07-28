@@ -1,15 +1,11 @@
-/* Dark mode setup */
-@media (prefers-color-scheme: dark) {
-    html {
-        color-scheme: dark;
-    }
-}
-
-html.dark {
+/* Force dark mode */
+html {
     color-scheme: dark;
+    background-color: #111827;
+    color: #f9fafb;
 }
 
-html.dark body {
+body {
     background-color: #111827;
     color: #f9fafb;
 }
@@ -99,12 +95,8 @@ html.dark body {
 }
 
 .hover-card:hover {
-    background-color: #f3f4f6;
-    transform: translateX(4px);
-}
-
-html.dark .hover-card:hover {
     background-color: #374151;
+    transform: translateX(4px);
 }
 
 .blocked-domain {
@@ -112,13 +104,9 @@ html.dark .hover-card:hover {
 }
 
 .blocked-domain:hover {
-    background-color: #fecaca;
+    background-color: #7f1d1d;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-}
-
-html.dark .blocked-domain:hover {
-    background-color: #7f1d1d;
 }
 
 .client-item {
@@ -126,15 +114,11 @@ html.dark .blocked-domain:hover {
 }
 
 .client-item:hover {
-    background-color: #dbeafe;
+    background-color: #1e3a8a;
     transform: translateX(4px);
 }
 
-html.dark .client-item:hover {
-    background-color: #1e3a8a;
-}
-
-/* Page load animations */
+/* Page load animations - Only applied on initial load */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -166,54 +150,38 @@ html.dark .client-item:hover {
     }
 }
 
-.animate-fade-in {
+/* Initial page load animations - will be removed after first load */
+.initial-load .animate-fade-in {
     animation: fadeIn 0.6s ease-out;
 }
 
-.animate-fade-in-delay {
+.initial-load .animate-fade-in-delay {
     animation: fadeIn 0.6s ease-out 0.2s both;
 }
 
-.animate-fade-in-up {
+.initial-load .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out 0.4s both;
 }
 
-.animate-slide-up {
+.initial-load .animate-slide-up {
     animation: slideUp 0.6s ease-out;
 }
 
-.animate-slide-up-delay-1 {
+.initial-load .animate-slide-up-delay-1 {
     animation: slideUp 0.6s ease-out 0.1s both;
 }
 
-.animate-slide-up-delay-2 {
+.initial-load .animate-slide-up-delay-2 {
     animation: slideUp 0.6s ease-out 0.2s both;
 }
 
-.animate-slide-up-delay-3 {
+.initial-load .animate-slide-up-delay-3 {
     animation: slideUp 0.6s ease-out 0.3s both;
 }
 
 /* Counter animation */
 .counter-animation {
     transition: all 0.3s ease;
-}
-
-/* Dark mode toggle */
-.dark-mode-icon-light {
-    display: block;
-}
-
-.dark-mode-icon-dark {
-    display: none;
-}
-
-html.dark .dark-mode-icon-light {
-    display: none;
-}
-
-html.dark .dark-mode-icon-dark {
-    display: block;
 }
 
 /* Smooth scrolling */
@@ -228,28 +196,15 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 4px;
+    background: #374151;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #6b7280;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-html.dark ::-webkit-scrollbar-track {
-    background: #374151;
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-    background: #6b7280;
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
 }
 
@@ -278,8 +233,8 @@ html.dark ::-webkit-scrollbar-thumb:hover {
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
 }
 
-/* Stagger animation for lists */
-.stagger-item {
+/* Stagger animation for lists - Only applied on initial load */
+.initial-load .stagger-item {
     opacity: 0;
     transform: translateY(20px);
     animation: staggerFadeIn 0.5s ease-out forwards;
@@ -292,12 +247,18 @@ html.dark ::-webkit-scrollbar-thumb:hover {
     }
 }
 
+/* Content that should not have stagger animation after initial load */
+.stagger-item:not(.initial-load .stagger-item) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
-    .animate-slide-up,
-    .animate-slide-up-delay-1,
-    .animate-slide-up-delay-2,
-    .animate-slide-up-delay-3 {
+    .initial-load .animate-slide-up,
+    .initial-load .animate-slide-up-delay-1,
+    .initial-load .animate-slide-up-delay-2,
+    .initial-load .animate-slide-up-delay-3 {
         animation-delay: 0s;
     }
 }

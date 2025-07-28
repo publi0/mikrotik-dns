@@ -1,37 +1,31 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>DNS Analytics Dashboard</title>
-        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='m2 17 10 5 10-5'/%3E%3Cpath d='m2 12 10 5 10-5'/%3E%3C/svg%3E" />
-        <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='m2 17 10 5 10-5'/%3E%3Cpath d='m2 12 10 5 10-5'/%3E%3C/svg%3E" />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='m2 17 10 5 10-5'/%3E%3Cpath d='m2 12 10 5 10-5'/%3E%3C/svg%3E"
+        />
+        <link
+            rel="apple-touch-icon"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='m2 17 10 5 10-5'/%3E%3Cpath d='m2 12 10 5 10-5'/%3E%3C/svg%3E"
+        />
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <link rel="stylesheet" href="style.css" />
     </head>
-    <body class="min-h-screen bg-gray-50 p-6">
-        <!-- Dark Mode Toggle -->
-        <div class="fixed top-4 right-4 z-40">
-            <button
-                id="darkModeToggle"
-                class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-300"
-            >
-                <i data-lucide="sun" class="h-4 w-4 dark-mode-icon-light"></i>
-                <i data-lucide="moon" class="h-4 w-4 dark-mode-icon-dark hidden"></i>
-                <span class="text-sm font-medium">Dark</span>
-            </button>
-        </div>
-
+    <body class="min-h-screen bg-gray-900 p-6">
         <div class="max-w-7xl mx-auto space-y-6">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white animate-fade-in">
+                    <h1 class="text-3xl font-bold text-white animate-fade-in">
                         DNS Analytics Dashboard
                     </h1>
                     <div
-                        class="flex items-center gap-4 text-gray-600 dark:text-gray-400 flex-wrap animate-fade-in-delay"
+                        class="flex items-center gap-4 text-gray-400 flex-wrap animate-fade-in-delay"
                     >
                         <span
                             >MikroTik DNS Query Analytics - Last 24 Hours</span
@@ -41,7 +35,7 @@
                 </div>
                 <div class="flex items-center gap-3 flex-wrap">
                     <div class="flex items-center gap-2 text-sm">
-                        <label class="flex items-center gap-2">
+                        <label class="flex items-center gap-2 text-gray-300">
                             <input
                                 type="checkbox"
                                 id="autoRefresh"
@@ -52,7 +46,7 @@
                         </label>
                         <select
                             id="refreshInterval"
-                            class="px-2 py-1 border rounded text-sm"
+                            class="px-2 py-1 border border-gray-600 rounded text-sm bg-gray-800 text-gray-300"
                         >
                             <option value="5">5s</option>
                             <option value="10">10s</option>
@@ -76,95 +70,108 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up">
+                <div
+                    class="bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <p class="text-sm font-medium text-gray-400">
                                 Total Queries
                             </p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white counter-animation" id="totalQueries">
+                            <p
+                                class="text-2xl font-bold text-white counter-animation"
+                                id="totalQueries"
+                            >
                                 0
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Last 24 hours</p>
+                            <p class="text-xs text-gray-400">Last 24 hours</p>
                         </div>
                         <i
                             data-lucide="bar-chart-3"
-                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
+                            class="h-8 w-8 text-gray-500"
                         ></i>
                     </div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-1">
+                <div
+                    class="bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-1"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <p class="text-sm font-medium text-gray-400">
                                 Blocked Queries
                             </p>
                             <p
-                                class="text-2xl font-bold text-red-600 dark:text-red-400 counter-animation"
+                                class="text-2xl font-bold text-red-400 counter-animation"
                                 id="blockedPercentage"
                             >
                                 0%
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400" id="blockedCount">
+                            <p class="text-xs text-gray-400" id="blockedCount">
                                 0 blocked
                             </p>
                         </div>
                         <i
                             data-lucide="shield-off"
-                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
+                            class="h-8 w-8 text-gray-500"
                         ></i>
                     </div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-2">
+                <div
+                    class="bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-2"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <p class="text-sm font-medium text-gray-400">
                                 Active Clients
                             </p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white counter-animation" id="activeClients">
+                            <p
+                                class="text-2xl font-bold text-white counter-animation"
+                                id="activeClients"
+                            >
                                 0
                             </p>
-                            <p class="text-xs text-gray-500">
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <p class="text-xs text-gray-400">
                                 Unique IP addresses
                             </p>
                         </div>
                         <i
                             data-lucide="users"
-                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
+                            class="h-8 w-8 text-gray-500"
                         ></i>
                     </div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-3">
+                <div
+                    class="bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-3"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <p class="text-sm font-medium text-gray-400">
                                 Unique Domains
                             </p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white counter-animation" id="uniqueDomains">
+                            <p
+                                class="text-2xl font-bold text-white counter-animation"
+                                id="uniqueDomains"
+                            >
                                 0
                             </p>
-                            <p class="text-xs text-gray-500">
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <p class="text-xs text-gray-400">
                                 Different domains queried
                             </p>
                         </div>
                         <i
                             data-lucide="globe"
-                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
+                            class="h-8 w-8 text-gray-500"
                         ></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
-                <div class="border-b border-gray-200 dark:border-gray-700">
+            <div
+                class="bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up"
+            >
+                <div class="border-b border-gray-700">
                     <nav
-                        class="flex flex-wrap gap-2 p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg"
+                        class="flex flex-wrap gap-2 p-4 bg-gray-700 rounded-t-lg"
                     >
                         <button
                             class="tab-button active flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow-sm transform hover:scale-105 transition-all duration-200"
@@ -173,19 +180,19 @@
                             Overview
                         </button>
                         <button
-                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
                             data-tab="domains"
                         >
                             Domains
                         </button>
                         <button
-                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
                             data-tab="clients"
                         >
                             Clients
                         </button>
                         <button
-                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
                             data-tab="security"
                         >
                             Security
@@ -195,20 +202,24 @@
 
                 <div id="overview" class="tab-content active p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        <div
+                            class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                        >
+                            <h3 class="text-lg font-semibold mb-2 text-white">
                                 Query Types Distribution
                             </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            <p class="text-gray-400 text-sm mb-4">
                                 DNS query types in the last 24 hours
                             </p>
                             <div id="queryTypesChart" class="space-y-3"></div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        <div
+                            class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                        >
+                            <h3 class="text-lg font-semibold mb-2 text-white">
                                 Top Domains
                             </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            <p class="text-gray-400 text-sm mb-4">
                                 Most queried domains
                             </p>
                             <div
@@ -218,17 +229,19 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                    <div
+                        class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                    >
                         <div class="flex items-center gap-2 mb-2">
                             <i
                                 data-lucide="shield-off"
-                                class="h-5 w-5 text-red-600 dark:text-red-400"
+                                class="h-5 w-5 text-red-400"
                             ></i>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h3 class="text-lg font-semibold text-white">
                                 Top Blocked Domains
                             </h3>
                         </div>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                        <p class="text-gray-400 text-sm mb-4">
                             Most frequently blocked domains in the last 24 hours
                         </p>
                         <div
@@ -240,11 +253,13 @@
 
                 <div id="domains" class="tab-content p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        <div
+                            class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                        >
+                            <h3 class="text-lg font-semibold mb-2 text-white">
                                 Top 20 Domains
                             </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            <p class="text-gray-400 text-sm mb-4">
                                 Most frequently queried domains
                             </p>
                             <div
@@ -252,11 +267,13 @@
                                 class="space-y-2 max-h-96 overflow-y-auto"
                             ></div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        <div
+                            class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                        >
+                            <h3 class="text-lg font-semibold mb-2 text-white">
                                 Domain Query Visualization
                             </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            <p class="text-gray-400 text-sm mb-4">
                                 Visual representation of query volumes
                             </p>
                             <div
@@ -269,11 +286,13 @@
 
                 <div id="clients" class="tab-content p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        <div
+                            class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                        >
+                            <h3 class="text-lg font-semibold mb-2 text-white">
                                 Top Clients
                             </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            <p class="text-gray-400 text-sm mb-4">
                                 Most active IP addresses
                             </p>
                             <div
@@ -281,18 +300,20 @@
                                 class="space-y-2 max-h-96 overflow-y-auto"
                             ></div>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        <div
+                            class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                        >
+                            <h3 class="text-lg font-semibold mb-2 text-white">
                                 Client Query Details
                             </h3>
                             <p
-                                class="text-gray-600 dark:text-gray-400 text-sm mb-4"
+                                class="text-gray-400 text-sm mb-4"
                                 id="clientDetailsTitle"
                             >
                                 Select a client to view details
                             </p>
                             <div id="clientDetails">
-                                <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                                <div class="text-center text-gray-400 py-8">
                                     Click on a client IP address to view their
                                     query history
                                 </div>
@@ -302,11 +323,13 @@
                 </div>
 
                 <div id="security" class="tab-content p-6">
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
-                        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                    <div
+                        class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300"
+                    >
+                        <h3 class="text-lg font-semibold mb-2 text-white">
                             Blocked Domains
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                        <p class="text-gray-400 text-sm mb-4">
                             Domains marked as UNKNOWN (potentially malicious)
                         </p>
                         <div
@@ -322,24 +345,28 @@
             id="unblockModal"
             class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 backdrop-blur-sm"
         >
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 transform transition-all duration-300 scale-95 modal-content">
+            <div
+                class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 transform transition-all duration-300 scale-95 modal-content"
+            >
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Unblock Domain</h3>
+                    <h3 class="text-lg font-semibold text-white">
+                        Unblock Domain
+                    </h3>
                     <button
                         id="closeModal"
-                        class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transform hover:scale-110 transition-all duration-200"
+                        class="text-gray-500 hover:text-gray-300 transform hover:scale-110 transition-all duration-200"
                     >
                         <i data-lucide="x" class="h-6 w-6"></i>
                     </button>
                 </div>
 
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <p class="text-sm text-gray-400">
                         To unblock <strong id="selectedDomain"></strong>, run
                         this command on your MikroTik router:
                     </p>
                     <div
-                        class="bg-gray-100 dark:bg-gray-700 p-3 rounded font-mono text-sm break-all text-gray-900 dark:text-gray-100"
+                        class="bg-gray-700 p-3 rounded font-mono text-sm break-all text-gray-100"
                         id="mikrotikCommand"
                     ></div>
                     <div class="flex gap-2">
@@ -351,12 +378,12 @@
                         </button>
                         <button
                             id="closeModalBtn"
-                            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transform hover:scale-105 transition-all duration-200"
+                            class="flex-1 px-4 py-2 border border-gray-600 rounded hover:bg-gray-700 text-gray-300 transform hover:scale-105 transition-all duration-200"
                         >
                             Close
                         </button>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <p class="text-xs text-gray-400">
                         This will create a DNS static entry that forwards the
                         domain to allow normal resolution.
                     </p>
