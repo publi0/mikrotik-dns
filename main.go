@@ -234,7 +234,7 @@ func serveAPI(db *sql.DB) {
 }
 
 func main() {
-	db, err := sql.Open("sqlite3", "/app/data/dnslogs.db")
+	db, err := sql.Open("sqlite3", "./data/dnslogs.db")
 	if err != nil {
 		log.Fatal(err)
 	}

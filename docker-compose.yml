@@ -1,7 +1,9 @@
 services:
   mikrotik-dns:
+    container_name: mikrotik-dns
+    restart: unless-stopped
     build: .
     ports:
       - "8080:8080"
-        volumes:
+    volumes:
       - ./data:/app/data

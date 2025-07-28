@@ -4,55 +4,34 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>DNS Analytics Dashboard</title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='m2 17 10 5 10-5'/%3E%3Cpath d='m2 12 10 5 10-5'/%3E%3C/svg%3E" />
+        <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='m2 17 10 5 10-5'/%3E%3Cpath d='m2 12 10 5 10-5'/%3E%3C/svg%3E" />
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
-        <style>
-            .tab-content {
-                display: none;
-            }
-            .tab-content.active {
-                display: block;
-            }
-            .progress-bar {
-                transition: width 0.3s ease;
-            }
-            .modal {
-                display: none;
-            }
-            .modal.active {
-                display: flex;
-            }
-            .loading {
-                animation: spin 1s linear infinite;
-            }
-            @keyframes spin {
-                from {
-                    transform: rotate(0deg);
-                }
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-            .hover-card:hover {
-                background-color: #f3f4f6;
-            }
-            .blocked-domain:hover {
-                background-color: #fecaca;
-            }
-            .client-item:hover {
-                background-color: #dbeafe;
-            }
-        </style>
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body class="min-h-screen bg-gray-50 p-6">
+        <!-- Dark Mode Toggle -->
+        <div class="fixed top-4 right-4 z-40">
+            <button
+                id="darkModeToggle"
+                class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-300"
+            >
+                <i data-lucide="sun" class="h-4 w-4 dark-mode-icon-light"></i>
+                <i data-lucide="moon" class="h-4 w-4 dark-mode-icon-dark hidden"></i>
+                <span class="text-sm font-medium">Dark</span>
+            </button>
+        </div>
+
         <div class="max-w-7xl mx-auto space-y-6">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white animate-fade-in">
                         DNS Analytics Dashboard
                     </h1>
                     <div
-                        class="flex items-center gap-4 text-gray-600 flex-wrap"
+                        class="flex items-center gap-4 text-gray-600 dark:text-gray-400 flex-wrap animate-fade-in-delay"
                     >
                         <span
                             >MikroTik DNS Query Analytics - Last 24 Hours</span
@@ -84,7 +63,7 @@
                     </div>
                     <button
                         id="refreshBtn"
-                        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md"
                     >
                         <i
                             data-lucide="refresh-ccw"
@@ -97,113 +76,116 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
                                 Total Queries
                             </p>
-                            <p class="text-2xl font-bold" id="totalQueries">
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white counter-animation" id="totalQueries">
                                 0
                             </p>
-                            <p class="text-xs text-gray-500">Last 24 hours</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Last 24 hours</p>
                         </div>
                         <i
                             data-lucide="bar-chart-3"
-                            class="h-8 w-8 text-gray-400"
+                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
                         ></i>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-1">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
                                 Blocked Queries
                             </p>
                             <p
-                                class="text-2xl font-bold text-red-600"
+                                class="text-2xl font-bold text-red-600 dark:text-red-400 counter-animation"
                                 id="blockedPercentage"
                             >
                                 0%
                             </p>
-                            <p class="text-xs text-gray-500" id="blockedCount">
+                            <p class="text-xs text-gray-500 dark:text-gray-400" id="blockedCount">
                                 0 blocked
                             </p>
                         </div>
                         <i
                             data-lucide="shield-off"
-                            class="h-8 w-8 text-gray-400"
+                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
                         ></i>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-2">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
                                 Active Clients
                             </p>
-                            <p class="text-2xl font-bold" id="activeClients">
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white counter-animation" id="activeClients">
                                 0
                             </p>
                             <p class="text-xs text-gray-500">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
                                 Unique IP addresses
                             </p>
                         </div>
                         <i
                             data-lucide="users"
-                            class="h-8 w-8 text-gray-400"
+                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
                         ></i>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-slide-up-delay-3">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
                                 Unique Domains
                             </p>
-                            <p class="text-2xl font-bold" id="uniqueDomains">
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white counter-animation" id="uniqueDomains">
                                 0
                             </p>
                             <p class="text-xs text-gray-500">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
                                 Different domains queried
                             </p>
                         </div>
                         <i
                             data-lucide="globe"
-                            class="h-8 w-8 text-gray-400"
+                            class="h-8 w-8 text-gray-400 dark:text-gray-500"
                         ></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow">
-                <div class="border-b border-gray-200">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up">
+                <div class="border-b border-gray-200 dark:border-gray-700">
                     <nav
-                        class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-t-lg"
+                        class="flex flex-wrap gap-2 p-4 bg-gray-100 dark:bg-gray-700 rounded-t-lg"
                     >
                         <button
-                            class="tab-button active flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow"
+                            class="tab-button active flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow-sm transform hover:scale-105 transition-all duration-200"
                             data-tab="overview"
                         >
                             Overview
                         </button>
                         <button
-                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-200"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
                             data-tab="domains"
                         >
                             Domains
                         </button>
                         <button
-                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-200"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
                             data-tab="clients"
                         >
                             Clients
                         </button>
                         <button
-                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-200"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-200"
                             data-tab="security"
                         >
                             Security
@@ -213,21 +195,20 @@
 
                 <div id="overview" class="tab-content active p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                                 Query Types Distribution
                             </h3>
-                            <p class="text-gray-600 text-sm mb-4">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                                 DNS query types in the last 24 hours
                             </p>
                             <div id="queryTypesChart" class="space-y-3"></div>
                         </div>
-
-                        <div class="bg-white border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                                 Top Domains
                             </h3>
-                            <p class="text-gray-600 text-sm mb-4">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                                 Most queried domains
                             </p>
                             <div
@@ -237,17 +218,17 @@
                         </div>
                     </div>
 
-                    <div class="bg-white border rounded-lg p-6">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
                         <div class="flex items-center gap-2 mb-2">
                             <i
                                 data-lucide="shield-off"
-                                class="h-5 w-5 text-red-600"
+                                class="h-5 w-5 text-red-600 dark:text-red-400"
                             ></i>
-                            <h3 class="text-lg font-semibold">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                                 Top Blocked Domains
                             </h3>
                         </div>
-                        <p class="text-gray-600 text-sm mb-4">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                             Most frequently blocked domains in the last 24 hours
                         </p>
                         <div
@@ -259,11 +240,11 @@
 
                 <div id="domains" class="tab-content p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                                 Top 20 Domains
                             </h3>
-                            <p class="text-gray-600 text-sm mb-4">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                                 Most frequently queried domains
                             </p>
                             <div
@@ -271,12 +252,11 @@
                                 class="space-y-2 max-h-96 overflow-y-auto"
                             ></div>
                         </div>
-
-                        <div class="bg-white border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                                 Domain Query Visualization
                             </h3>
-                            <p class="text-gray-600 text-sm mb-4">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                                 Visual representation of query volumes
                             </p>
                             <div
@@ -289,11 +269,11 @@
 
                 <div id="clients" class="tab-content p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                                 Top Clients
                             </h3>
-                            <p class="text-gray-600 text-sm mb-4">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                                 Most active IP addresses
                             </p>
                             <div
@@ -301,19 +281,18 @@
                                 class="space-y-2 max-h-96 overflow-y-auto"
                             ></div>
                         </div>
-
-                        <div class="bg-white border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                                 Client Query Details
                             </h3>
                             <p
-                                class="text-gray-600 text-sm mb-4"
+                                class="text-gray-600 dark:text-gray-400 text-sm mb-4"
                                 id="clientDetailsTitle"
                             >
                                 Select a client to view details
                             </p>
                             <div id="clientDetails">
-                                <div class="text-center text-gray-500 py-8">
+                                <div class="text-center text-gray-500 dark:text-gray-400 py-8">
                                     Click on a client IP address to view their
                                     query history
                                 </div>
@@ -323,11 +302,11 @@
                 </div>
 
                 <div id="security" class="tab-content p-6">
-                    <div class="bg-white border rounded-lg p-6">
-                        <h3 class="text-lg font-semibold mb-2">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-all duration-300">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                             Blocked Domains
                         </h3>
-                        <p class="text-gray-600 text-sm mb-4">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                             Domains marked as UNKNOWN (potentially malicious)
                         </p>
                         <div
@@ -341,383 +320,49 @@
 
         <div
             id="unblockModal"
-            class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50"
+            class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 backdrop-blur-sm"
         >
-            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 transform transition-all duration-300 scale-95 modal-content">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold">Unblock Domain</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Unblock Domain</h3>
                     <button
                         id="closeModal"
-                        class="text-gray-400 hover:text-gray-600"
+                        class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transform hover:scale-110 transition-all duration-200"
                     >
                         <i data-lucide="x" class="h-6 w-6"></i>
                     </button>
                 </div>
 
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-600">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
                         To unblock <strong id="selectedDomain"></strong>, run
                         this command on your MikroTik router:
                     </p>
                     <div
-                        class="bg-gray-100 p-3 rounded font-mono text-sm break-all"
+                        class="bg-gray-100 dark:bg-gray-700 p-3 rounded font-mono text-sm break-all text-gray-900 dark:text-gray-100"
                         id="mikrotikCommand"
                     ></div>
                     <div class="flex gap-2">
                         <button
                             id="copyCommand"
-                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transform hover:scale-105 transition-all duration-200"
                         >
                             Copy Command
                         </button>
                         <button
                             id="closeModalBtn"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transform hover:scale-105 transition-all duration-200"
                         >
                             Close
                         </button>
                     </div>
-                    <p class="text-xs text-gray-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
                         This will create a DNS static entry that forwards the
                         domain to allow normal resolution.
                     </p>
                 </div>
             </div>
         </div>
-
-        <script>
-            const dashboardData = {
-                topDomains: [],
-                queryTypes: [],
-                blockedDomains: [],
-                clients: [],
-                clientQueries: [],
-                selectedClient: "",
-                currentPage: 1,
-                loading: false,
-                autoRefresh: true,
-                refreshInterval: 5,
-                lastUpdated: null,
-            };
-            let refreshTimer = null;
-            const API_ENDPOINTS = {
-                topDomains: "/api/top-domains",
-                queryTypes: "/api/query-types",
-                blockedDomains: "/api/blocked-domains",
-                clients: "/api/clients",
-                clientQueries: "/api/client-queries",
-            };
-            document.addEventListener("DOMContentLoaded", () => {
-                initializeEventListeners();
-                fetchAllData();
-                setupAutoRefresh();
-                lucide.createIcons();
-            });
-            function initializeEventListeners() {
-                document.querySelectorAll(".tab-button").forEach((button) => {
-                    button.addEventListener("click", function () {
-                        switchTab(this.dataset.tab);
-                    });
-                });
-                document
-                    .getElementById("refreshBtn")
-                    .addEventListener("click", fetchAllData);
-                document
-                    .getElementById("autoRefresh")
-                    .addEventListener("change", function () {
-                        dashboardData.autoRefresh = this.checked;
-                        setupAutoRefresh();
-                    });
-                document
-                    .getElementById("refreshInterval")
-                    .addEventListener("change", function () {
-                        dashboardData.refreshInterval = Number.parseInt(
-                            this.value,
-                        );
-                        setupAutoRefresh();
-                    });
-                document
-                    .getElementById("closeModal")
-                    .addEventListener("click", closeModal);
-                document
-                    .getElementById("closeModalBtn")
-                    .addEventListener("click", closeModal);
-                document
-                    .getElementById("copyCommand")
-                    .addEventListener("click", copyToClipboard);
-                document
-                    .getElementById("unblockModal")
-                    .addEventListener("click", function (e) {
-                        if (e.target === this) closeModal();
-                    });
-            }
-            function switchTab(tabName) {
-                document.querySelectorAll(".tab-button").forEach((button) => {
-                    button.classList.remove(
-                        "active",
-                        "bg-blue-600",
-                        "text-white",
-                        "shadow",
-                    );
-                    button.classList.add("text-gray-500");
-                });
-                document
-                    .querySelector(`[data-tab="${tabName}"]`)
-                    .classList.add(
-                        "active",
-                        "bg-blue-600",
-                        "text-white",
-                        "shadow",
-                    );
-                document
-                    .querySelector(`[data-tab="${tabName}"]`)
-                    .classList.remove("text-gray-500");
-                document.querySelectorAll(".tab-content").forEach((content) => {
-                    content.classList.remove("active");
-                });
-                document.getElementById(tabName).classList.add("active");
-            }
-            async function fetchAllData() {
-                if (dashboardData.loading) return;
-                dashboardData.loading = true;
-                updateLoadingState(true);
-                try {
-                    const [domainsRes, typesRes, blockedRes, clientsRes] =
-                        await Promise.all([
-                            fetch(API_ENDPOINTS.topDomains),
-                            fetch(API_ENDPOINTS.queryTypes),
-                            fetch(API_ENDPOINTS.blockedDomains),
-                            fetch(API_ENDPOINTS.clients),
-                        ]);
-                    dashboardData.topDomains = await domainsRes.json();
-                    dashboardData.queryTypes = await typesRes.json();
-                    dashboardData.blockedDomains = await blockedRes.json();
-                    dashboardData.clients = await clientsRes.json();
-                    dashboardData.lastUpdated = new Date();
-                    updateAllViews();
-                } catch (error) {
-                    console.error("Failed to fetch data:", error);
-                } finally {
-                    dashboardData.loading = false;
-                    updateLoadingState(false);
-                }
-            }
-            async function fetchClientQueries(client, page = 1) {
-                try {
-                    const response = await fetch(
-                        `${API_ENDPOINTS.clientQueries}?client=${client}&page=${page}&page_size=20`,
-                    );
-                    dashboardData.clientQueries = await response.json();
-                    dashboardData.selectedClient = client;
-                    dashboardData.currentPage = page;
-                    updateClientDetails();
-                } catch (error) {
-                    console.error("Failed to fetch client queries:", error);
-                }
-            }
-            function updateLoadingState(loading) {
-                const refreshIcon = document.getElementById("refreshIcon");
-                const refreshBtn = document.getElementById("refreshBtn");
-                if (loading) {
-                    refreshIcon.classList.add("loading");
-                    refreshBtn.disabled = true;
-                } else {
-                    refreshIcon.classList.remove("loading");
-                    refreshBtn.disabled = false;
-                }
-            }
-            function updateAllViews() {
-                updateStatsCards();
-                updateQueryTypesChart();
-                updateTopDomainsOverview();
-                updateBlockedDomainsOverview();
-                updateTopDomainsList();
-                updateDomainVisualization();
-                updateTopClientsList();
-                updateBlockedDomainsList();
-                updateLastUpdatedTime();
-            }
-            function updateStatsCards() {
-                const totalQueries = dashboardData.queryTypes.reduce(
-                    (sum, item) => sum + item.count,
-                    0,
-                );
-                const blockedQueries =
-                    dashboardData.queryTypes.find((t) => t.type === "UNKNOWN")
-                        ?.count || 0;
-                const blockedPercentage =
-                    totalQueries > 0
-                        ? ((blockedQueries / totalQueries) * 100).toFixed(1)
-                        : "0";
-                document.getElementById("totalQueries").textContent =
-                    totalQueries.toLocaleString();
-                document.getElementById("blockedPercentage").textContent =
-                    `${blockedPercentage}%`;
-                document.getElementById("blockedCount").textContent =
-                    `${blockedQueries} blocked`;
-                document.getElementById("activeClients").textContent =
-                    dashboardData.clients.length;
-                document.getElementById("uniqueDomains").textContent =
-                    dashboardData.topDomains.length;
-            }
-            function updateQueryTypesChart() {
-                const container = document.getElementById("queryTypesChart");
-                const totalQueries = dashboardData.queryTypes.reduce(
-                    (sum, item) => sum + item.count,
-                    0,
-                );
-                container.innerHTML = dashboardData.queryTypes
-                    .map((item, index) => {
-                        const percentage =
-                            totalQueries > 0
-                                ? ((item.count / totalQueries) * 100).toFixed(1)
-                                : "0";
-                        const color = `hsl(${index * 45}, 70%, 50%)`;
-                        return `<div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-4 h-4 rounded" style="background-color: ${color}"></div><span class="font-medium">${item.type}</span></div><div class="text-right"><div class="font-bold">${item.count.toLocaleString()}</div><div class="text-xs text-gray-500">${percentage}%</div></div></div>`;
-                    })
-                    .join("");
-            }
-            function updateTopDomainsOverview() {
-                const container = document.getElementById("topDomainsOverview");
-                container.innerHTML = dashboardData.topDomains
-                    .slice(0, 10)
-                    .map(
-                        (item, index) =>
-                            `<div class="flex items-center justify-between p-2 rounded hover-card"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500">#${index + 1}</span><span class="font-medium">${item.domain}</span></div><span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">${item.count}</span></div>`,
-                    )
-                    .join("");
-            }
-            function updateBlockedDomainsOverview() {
-                const container = document.getElementById(
-                    "blockedDomainsOverview",
-                );
-                container.innerHTML = dashboardData.blockedDomains
-                    .slice(0, 12)
-                    .map(
-                        (item, index) =>
-                            `<div class="flex items-center justify-between p-3 border border-red-200 rounded-lg bg-red-50 blocked-domain cursor-pointer transition-colors" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain"><div class="flex items-center gap-2 min-w-0"><span class="text-xs font-mono text-red-500 flex-shrink-0">#${index + 1}</span><span class="font-medium text-red-900 truncate" title="${item.domain}">${item.domain}</span></div><span class="px-2 py-1 bg-red-600 text-white text-xs rounded flex-shrink-0">${item.count}</span></div>`,
-                    )
-                    .join("");
-            }
-            function updateTopDomainsList() {
-                const container = document.getElementById("topDomainsList");
-                container.innerHTML = dashboardData.topDomains
-                    .map(
-                        (item, index) =>
-                            `<div class="flex items-center justify-between p-3 border rounded-lg"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 w-8">#${index + 1}</span><span class="font-medium">${item.domain}</span></div><span class="px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded">${item.count} queries</span></div>`,
-                    )
-                    .join("");
-            }
-            function updateDomainVisualization() {
-                const container = document.getElementById(
-                    "domainVisualization",
-                );
-                const maxCount = dashboardData.topDomains[0]?.count || 1;
-                container.innerHTML = dashboardData.topDomains
-                    .slice(0, 10)
-                    .map((item) => {
-                        const percentage = (item.count / maxCount) * 100;
-                        return `<div class="space-y-1"><div class="flex justify-between text-sm"><span class="truncate">${item.domain}</span><span class="font-mono">${item.count}</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: ${percentage}%"></div></div></div>`;
-                    })
-                    .join("");
-            }
-            function updateTopClientsList() {
-                const container = document.getElementById("topClientsList");
-                container.innerHTML = dashboardData.clients
-                    .map(
-                        (item, index) =>
-                            `<div class="flex items-center justify-between p-3 border rounded-lg cursor-pointer client-item transition-colors" onclick="selectClient('${item.client}')"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 w-8">#${index + 1}</span><span class="font-mono">${item.client}</span></div><span class="px-2 py-1 ${dashboardData.selectedClient === item.client ? "bg-blue-600 text-white" : "border border-gray-300 text-gray-700"} text-xs rounded">${item.count} queries</span></div>`,
-                    )
-                    .join("");
-            }
-            function updateBlockedDomainsList() {
-                const container = document.getElementById("blockedDomainsList");
-                container.innerHTML = dashboardData.blockedDomains
-                    .map(
-                        (item, index) =>
-                            `<div class="p-4 border border-red-200 rounded-lg bg-red-50 cursor-pointer blocked-domain transition-colors" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><i data-lucide="shield-off" class="h-4 w-4 text-red-600"></i><span class="font-medium text-red-900">${item.domain}</span></div><span class="px-2 py-1 bg-red-600 text-white text-xs rounded">${item.count}</span></div><p class="text-xs text-red-600 mt-1">Blocked ${item.count} times</p></div>`,
-                    )
-                    .join("");
-            }
-            function selectClient(client) {
-                fetchClientQueries(client, 1);
-            }
-            function updateClientDetails() {
-                const container = document.getElementById("clientDetails");
-                const titleElement =
-                    document.getElementById("clientDetailsTitle");
-                if (!dashboardData.selectedClient) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-8">Click on a client IP address to view their query history</div>`;
-                    titleElement.textContent =
-                        "Select a client to view details";
-                    return;
-                }
-                titleElement.textContent = `Queries from ${dashboardData.selectedClient}`;
-                container.innerHTML = `<div class="space-y-4"><div class="flex items-center gap-2"><input type="text" value="${dashboardData.selectedClient}" class="flex-1 px-3 py-2 border border-gray-300 rounded font-mono text-sm" onchange="selectClient(this.value)"><button onclick="selectClient(document.querySelector('#clientDetails input').value)" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"><i data-lucide="search" class="h-4 w-4"></i></button></div><div class="space-y-2 max-h-80 overflow-y-auto">${dashboardData.clientQueries.map((query) => `<div class="flex items-center justify-between p-2 border rounded text-sm"><div class="flex items-center gap-3"><span class="font-mono text-gray-500">${formatTimestamp(query.timestamp)}</span><span class="font-medium">${query.domain}</span></div><div class="flex items-center gap-2"><span class="px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded">${query.type}</span>${query.blocked === 1 ? '<span class="px-2 py-1 bg-red-600 text-white text-xs rounded">BLOCKED</span>' : ""}</div></div>`).join("")}</div><div class="flex justify-center gap-2"><button onclick="changePage(-1)" ${dashboardData.currentPage === 1 ? "disabled" : ""} class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50">Previous</button><span class="px-3 py-1 text-sm">Page ${dashboardData.currentPage}</span><button onclick="changePage(1)" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button></div></div>`;
-            }
-            function changePage(direction) {
-                const newPage = Math.max(
-                    1,
-                    dashboardData.currentPage + direction,
-                );
-                fetchClientQueries(dashboardData.selectedClient, newPage);
-            }
-            function updateLastUpdatedTime() {
-                const element = document.getElementById("lastUpdated");
-                if (dashboardData.lastUpdated) {
-                    element.textContent = `Last updated: ${dashboardData.lastUpdated.toLocaleTimeString()}`;
-                }
-            }
-            function setupAutoRefresh() {
-                if (refreshTimer) {
-                    clearInterval(refreshTimer);
-                    refreshTimer = null;
-                }
-                if (
-                    dashboardData.autoRefresh &&
-                    dashboardData.refreshInterval > 0
-                ) {
-                    refreshTimer = setInterval(
-                        fetchAllData,
-                        dashboardData.refreshInterval * 1000,
-                    );
-                }
-            }
-            function formatTimestamp(timestamp) {
-                return new Date(timestamp * 1000).toLocaleString();
-            }
-            function openUnblockModal(domain) {
-                document.getElementById("selectedDomain").textContent = domain;
-                document.getElementById("mikrotikCommand").textContent =
-                    generateMikroTikCommand(domain);
-                document.getElementById("unblockModal").classList.add("active");
-                lucide.createIcons();
-            }
-            function closeModal() {
-                document
-                    .getElementById("unblockModal")
-                    .classList.remove("active");
-            }
-            function generateMikroTikCommand(domain) {
-                return `/ip/dns/static add name="${domain}" type=FWD match-subdomain=yes`;
-            }
-            async function copyToClipboard() {
-                const command =
-                    document.getElementById("mikrotikCommand").textContent;
-                try {
-                    await navigator.clipboard.writeText(command);
-                    alert("Command copied to clipboard!");
-                } catch (err) {
-                    console.error("Failed to copy: ", err);
-                    const textArea = document.createElement("textarea");
-                    textArea.value = command;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textArea);
-                    alert("Command copied to clipboard!");
-                }
-            }
-        </script>
+        <script src="script.js"></script>
     </body>
 </html>

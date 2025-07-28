@@ -1,0 +1,303 @@
+/* Dark mode setup */
+@media (prefers-color-scheme: dark) {
+    html {
+        color-scheme: dark;
+    }
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark body {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+/* Tab content visibility */
+.tab-content {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Progress bar animations */
+.progress-bar {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: progressGrow 1s ease-out;
+}
+
+@keyframes progressGrow {
+    from {
+        width: 0%;
+    }
+}
+
+/* Modal animations */
+.modal {
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    opacity: 1;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+    animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: scale(0.9) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Loading animation */
+.loading {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Hover effects */
+.hover-card {
+    transition: all 0.2s ease;
+}
+
+.hover-card:hover {
+    background-color: #f3f4f6;
+    transform: translateX(4px);
+}
+
+html.dark .hover-card:hover {
+    background-color: #374151;
+}
+
+.blocked-domain {
+    transition: all 0.2s ease;
+}
+
+.blocked-domain:hover {
+    background-color: #fecaca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+html.dark .blocked-domain:hover {
+    background-color: #7f1d1d;
+}
+
+.client-item {
+    transition: all 0.2s ease;
+}
+
+.client-item:hover {
+    background-color: #dbeafe;
+    transform: translateX(4px);
+}
+
+html.dark .client-item:hover {
+    background-color: #1e3a8a;
+}
+
+/* Page load animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-fade-in-delay {
+    animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+.animate-slide-up-delay-1 {
+    animation: slideUp 0.6s ease-out 0.1s both;
+}
+
+.animate-slide-up-delay-2 {
+    animation: slideUp 0.6s ease-out 0.2s both;
+}
+
+.animate-slide-up-delay-3 {
+    animation: slideUp 0.6s ease-out 0.3s both;
+}
+
+/* Counter animation */
+.counter-animation {
+    transition: all 0.3s ease;
+}
+
+/* Dark mode toggle */
+.dark-mode-icon-light {
+    display: block;
+}
+
+.dark-mode-icon-dark {
+    display: none;
+}
+
+html.dark .dark-mode-icon-light {
+    display: none;
+}
+
+html.dark .dark-mode-icon-dark {
+    display: block;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+html.dark ::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Glow effect for important elements */
+.glow-effect {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    transition: box-shadow 0.3s ease;
+}
+
+.glow-effect:hover {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+/* Stagger animation for lists */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: staggerFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes staggerFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .animate-slide-up,
+    .animate-slide-up-delay-1,
+    .animate-slide-up-delay-2,
+    .animate-slide-up-delay-3 {
+        animation-delay: 0s;
+    }
+}
