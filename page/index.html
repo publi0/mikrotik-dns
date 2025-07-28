@@ -5,16 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>DNS Analytics Dashboard</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             .tab-content {
                 display: none;
             }
             .tab-content.active {
                 display: block;
-            }
-            .tab-button.active {
-                background-color: #3b82f6;
-                color: white;
             }
             .progress-bar {
                 transition: width 0.3s ease;
@@ -49,7 +46,6 @@
     </head>
     <body class="min-h-screen bg-gray-50 p-6">
         <div class="max-w-7xl mx-auto space-y-6">
-            <!-- Header -->
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">
@@ -90,26 +86,16 @@
                         id="refreshBtn"
                         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
-                        <svg
+                        <i
+                            data-lucide="refresh-ccw"
                             id="refreshIcon"
                             class="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                            ></path>
-                        </svg>
+                        ></i>
                         Refresh Data
                     </button>
                 </div>
             </div>
 
-            <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="bg-white p-6 rounded-lg shadow">
                     <div class="flex items-center justify-between">
@@ -122,19 +108,10 @@
                             </p>
                             <p class="text-xs text-gray-500">Last 24 hours</p>
                         </div>
-                        <svg
+                        <i
+                            data-lucide="bar-chart-3"
                             class="h-8 w-8 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                            ></path>
-                        </svg>
+                        ></i>
                     </div>
                 </div>
 
@@ -154,19 +131,10 @@
                                 0 blocked
                             </p>
                         </div>
-                        <svg
+                        <i
+                            data-lucide="shield-off"
                             class="h-8 w-8 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                            ></path>
-                        </svg>
+                        ></i>
                     </div>
                 </div>
 
@@ -183,19 +151,10 @@
                                 Unique IP addresses
                             </p>
                         </div>
-                        <svg
+                        <i
+                            data-lucide="users"
                             class="h-8 w-8 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                            ></path>
-                        </svg>
+                        ></i>
                     </div>
                 </div>
 
@@ -212,47 +171,39 @@
                                 Different domains queried
                             </p>
                         </div>
-                        <svg
+                        <i
+                            data-lucide="globe"
                             class="h-8 w-8 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
-                            ></path>
-                        </svg>
+                        ></i>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabs -->
             <div class="bg-white rounded-lg shadow">
                 <div class="border-b border-gray-200">
-                    <nav class="flex space-x-8 px-6">
+                    <nav
+                        class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-t-lg"
+                    >
                         <button
-                            class="tab-button active py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600"
+                            class="tab-button active flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow"
                             data-tab="overview"
                         >
                             Overview
                         </button>
                         <button
-                            class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-200"
                             data-tab="domains"
                         >
                             Domains
                         </button>
                         <button
-                            class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-200"
                             data-tab="clients"
                         >
                             Clients
                         </button>
                         <button
-                            class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700"
+                            class="tab-button flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-200"
                             data-tab="security"
                         >
                             Security
@@ -260,10 +211,8 @@
                     </nav>
                 </div>
 
-                <!-- Overview Tab -->
                 <div id="overview" class="tab-content active p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Query Types Chart -->
                         <div class="bg-white border rounded-lg p-6">
                             <h3 class="text-lg font-semibold mb-2">
                                 Query Types Distribution
@@ -274,7 +223,6 @@
                             <div id="queryTypesChart" class="space-y-3"></div>
                         </div>
 
-                        <!-- Top Domains -->
                         <div class="bg-white border rounded-lg p-6">
                             <h3 class="text-lg font-semibold mb-2">
                                 Top Domains
@@ -289,22 +237,12 @@
                         </div>
                     </div>
 
-                    <!-- Top Blocked Domains -->
                     <div class="bg-white border rounded-lg p-6">
                         <div class="flex items-center gap-2 mb-2">
-                            <svg
+                            <i
+                                data-lucide="shield-off"
                                 class="h-5 w-5 text-red-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                ></path>
-                            </svg>
+                            ></i>
                             <h3 class="text-lg font-semibold">
                                 Top Blocked Domains
                             </h3>
@@ -319,7 +257,6 @@
                     </div>
                 </div>
 
-                <!-- Domains Tab -->
                 <div id="domains" class="tab-content p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white border rounded-lg p-6">
@@ -350,7 +287,6 @@
                     </div>
                 </div>
 
-                <!-- Clients Tab -->
                 <div id="clients" class="tab-content p-6 space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white border rounded-lg p-6">
@@ -386,7 +322,6 @@
                     </div>
                 </div>
 
-                <!-- Security Tab -->
                 <div id="security" class="tab-content p-6">
                     <div class="bg-white border rounded-lg p-6">
                         <h3 class="text-lg font-semibold mb-2">
@@ -404,7 +339,6 @@
             </div>
         </div>
 
-        <!-- Unblock Domain Modal -->
         <div
             id="unblockModal"
             class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50"
@@ -416,19 +350,7 @@
                         id="closeModal"
                         class="text-gray-400 hover:text-gray-600"
                     >
-                        <svg
-                            class="h-6 w-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            ></path>
-                        </svg>
+                        <i data-lucide="x" class="h-6 w-6"></i>
                     </button>
                 </div>
 
@@ -437,12 +359,10 @@
                         To unblock <strong id="selectedDomain"></strong>, run
                         this command on your MikroTik router:
                     </p>
-
                     <div
                         class="bg-gray-100 p-3 rounded font-mono text-sm break-all"
                         id="mikrotikCommand"
                     ></div>
-
                     <div class="flex gap-2">
                         <button
                             id="copyCommand"
@@ -457,7 +377,6 @@
                             Close
                         </button>
                     </div>
-
                     <p class="text-xs text-gray-500">
                         This will create a DNS static entry that forwards the
                         domain to allow normal resolution.
@@ -466,6 +385,339 @@
             </div>
         </div>
 
-        <script src="script.js"></script>
+        <script>
+            const dashboardData = {
+                topDomains: [],
+                queryTypes: [],
+                blockedDomains: [],
+                clients: [],
+                clientQueries: [],
+                selectedClient: "",
+                currentPage: 1,
+                loading: false,
+                autoRefresh: true,
+                refreshInterval: 5,
+                lastUpdated: null,
+            };
+            let refreshTimer = null;
+            const API_ENDPOINTS = {
+                topDomains: "/api/top-domains",
+                queryTypes: "/api/query-types",
+                blockedDomains: "/api/blocked-domains",
+                clients: "/api/clients",
+                clientQueries: "/api/client-queries",
+            };
+            document.addEventListener("DOMContentLoaded", () => {
+                initializeEventListeners();
+                fetchAllData();
+                setupAutoRefresh();
+                lucide.createIcons();
+            });
+            function initializeEventListeners() {
+                document.querySelectorAll(".tab-button").forEach((button) => {
+                    button.addEventListener("click", function () {
+                        switchTab(this.dataset.tab);
+                    });
+                });
+                document
+                    .getElementById("refreshBtn")
+                    .addEventListener("click", fetchAllData);
+                document
+                    .getElementById("autoRefresh")
+                    .addEventListener("change", function () {
+                        dashboardData.autoRefresh = this.checked;
+                        setupAutoRefresh();
+                    });
+                document
+                    .getElementById("refreshInterval")
+                    .addEventListener("change", function () {
+                        dashboardData.refreshInterval = Number.parseInt(
+                            this.value,
+                        );
+                        setupAutoRefresh();
+                    });
+                document
+                    .getElementById("closeModal")
+                    .addEventListener("click", closeModal);
+                document
+                    .getElementById("closeModalBtn")
+                    .addEventListener("click", closeModal);
+                document
+                    .getElementById("copyCommand")
+                    .addEventListener("click", copyToClipboard);
+                document
+                    .getElementById("unblockModal")
+                    .addEventListener("click", function (e) {
+                        if (e.target === this) closeModal();
+                    });
+            }
+            function switchTab(tabName) {
+                document.querySelectorAll(".tab-button").forEach((button) => {
+                    button.classList.remove(
+                        "active",
+                        "bg-blue-600",
+                        "text-white",
+                        "shadow",
+                    );
+                    button.classList.add("text-gray-500");
+                });
+                document
+                    .querySelector(`[data-tab="${tabName}"]`)
+                    .classList.add(
+                        "active",
+                        "bg-blue-600",
+                        "text-white",
+                        "shadow",
+                    );
+                document
+                    .querySelector(`[data-tab="${tabName}"]`)
+                    .classList.remove("text-gray-500");
+                document.querySelectorAll(".tab-content").forEach((content) => {
+                    content.classList.remove("active");
+                });
+                document.getElementById(tabName).classList.add("active");
+            }
+            async function fetchAllData() {
+                if (dashboardData.loading) return;
+                dashboardData.loading = true;
+                updateLoadingState(true);
+                try {
+                    const [domainsRes, typesRes, blockedRes, clientsRes] =
+                        await Promise.all([
+                            fetch(API_ENDPOINTS.topDomains),
+                            fetch(API_ENDPOINTS.queryTypes),
+                            fetch(API_ENDPOINTS.blockedDomains),
+                            fetch(API_ENDPOINTS.clients),
+                        ]);
+                    dashboardData.topDomains = await domainsRes.json();
+                    dashboardData.queryTypes = await typesRes.json();
+                    dashboardData.blockedDomains = await blockedRes.json();
+                    dashboardData.clients = await clientsRes.json();
+                    dashboardData.lastUpdated = new Date();
+                    updateAllViews();
+                } catch (error) {
+                    console.error("Failed to fetch data:", error);
+                } finally {
+                    dashboardData.loading = false;
+                    updateLoadingState(false);
+                }
+            }
+            async function fetchClientQueries(client, page = 1) {
+                try {
+                    const response = await fetch(
+                        `${API_ENDPOINTS.clientQueries}?client=${client}&page=${page}&page_size=20`,
+                    );
+                    dashboardData.clientQueries = await response.json();
+                    dashboardData.selectedClient = client;
+                    dashboardData.currentPage = page;
+                    updateClientDetails();
+                } catch (error) {
+                    console.error("Failed to fetch client queries:", error);
+                }
+            }
+            function updateLoadingState(loading) {
+                const refreshIcon = document.getElementById("refreshIcon");
+                const refreshBtn = document.getElementById("refreshBtn");
+                if (loading) {
+                    refreshIcon.classList.add("loading");
+                    refreshBtn.disabled = true;
+                } else {
+                    refreshIcon.classList.remove("loading");
+                    refreshBtn.disabled = false;
+                }
+            }
+            function updateAllViews() {
+                updateStatsCards();
+                updateQueryTypesChart();
+                updateTopDomainsOverview();
+                updateBlockedDomainsOverview();
+                updateTopDomainsList();
+                updateDomainVisualization();
+                updateTopClientsList();
+                updateBlockedDomainsList();
+                updateLastUpdatedTime();
+            }
+            function updateStatsCards() {
+                const totalQueries = dashboardData.queryTypes.reduce(
+                    (sum, item) => sum + item.count,
+                    0,
+                );
+                const blockedQueries =
+                    dashboardData.queryTypes.find((t) => t.type === "UNKNOWN")
+                        ?.count || 0;
+                const blockedPercentage =
+                    totalQueries > 0
+                        ? ((blockedQueries / totalQueries) * 100).toFixed(1)
+                        : "0";
+                document.getElementById("totalQueries").textContent =
+                    totalQueries.toLocaleString();
+                document.getElementById("blockedPercentage").textContent =
+                    `${blockedPercentage}%`;
+                document.getElementById("blockedCount").textContent =
+                    `${blockedQueries} blocked`;
+                document.getElementById("activeClients").textContent =
+                    dashboardData.clients.length;
+                document.getElementById("uniqueDomains").textContent =
+                    dashboardData.topDomains.length;
+            }
+            function updateQueryTypesChart() {
+                const container = document.getElementById("queryTypesChart");
+                const totalQueries = dashboardData.queryTypes.reduce(
+                    (sum, item) => sum + item.count,
+                    0,
+                );
+                container.innerHTML = dashboardData.queryTypes
+                    .map((item, index) => {
+                        const percentage =
+                            totalQueries > 0
+                                ? ((item.count / totalQueries) * 100).toFixed(1)
+                                : "0";
+                        const color = `hsl(${index * 45}, 70%, 50%)`;
+                        return `<div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-4 h-4 rounded" style="background-color: ${color}"></div><span class="font-medium">${item.type}</span></div><div class="text-right"><div class="font-bold">${item.count.toLocaleString()}</div><div class="text-xs text-gray-500">${percentage}%</div></div></div>`;
+                    })
+                    .join("");
+            }
+            function updateTopDomainsOverview() {
+                const container = document.getElementById("topDomainsOverview");
+                container.innerHTML = dashboardData.topDomains
+                    .slice(0, 10)
+                    .map(
+                        (item, index) =>
+                            `<div class="flex items-center justify-between p-2 rounded hover-card"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500">#${index + 1}</span><span class="font-medium">${item.domain}</span></div><span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">${item.count}</span></div>`,
+                    )
+                    .join("");
+            }
+            function updateBlockedDomainsOverview() {
+                const container = document.getElementById(
+                    "blockedDomainsOverview",
+                );
+                container.innerHTML = dashboardData.blockedDomains
+                    .slice(0, 12)
+                    .map(
+                        (item, index) =>
+                            `<div class="flex items-center justify-between p-3 border border-red-200 rounded-lg bg-red-50 blocked-domain cursor-pointer transition-colors" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain"><div class="flex items-center gap-2 min-w-0"><span class="text-xs font-mono text-red-500 flex-shrink-0">#${index + 1}</span><span class="font-medium text-red-900 truncate" title="${item.domain}">${item.domain}</span></div><span class="px-2 py-1 bg-red-600 text-white text-xs rounded flex-shrink-0">${item.count}</span></div>`,
+                    )
+                    .join("");
+            }
+            function updateTopDomainsList() {
+                const container = document.getElementById("topDomainsList");
+                container.innerHTML = dashboardData.topDomains
+                    .map(
+                        (item, index) =>
+                            `<div class="flex items-center justify-between p-3 border rounded-lg"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 w-8">#${index + 1}</span><span class="font-medium">${item.domain}</span></div><span class="px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded">${item.count} queries</span></div>`,
+                    )
+                    .join("");
+            }
+            function updateDomainVisualization() {
+                const container = document.getElementById(
+                    "domainVisualization",
+                );
+                const maxCount = dashboardData.topDomains[0]?.count || 1;
+                container.innerHTML = dashboardData.topDomains
+                    .slice(0, 10)
+                    .map((item) => {
+                        const percentage = (item.count / maxCount) * 100;
+                        return `<div class="space-y-1"><div class="flex justify-between text-sm"><span class="truncate">${item.domain}</span><span class="font-mono">${item.count}</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: ${percentage}%"></div></div></div>`;
+                    })
+                    .join("");
+            }
+            function updateTopClientsList() {
+                const container = document.getElementById("topClientsList");
+                container.innerHTML = dashboardData.clients
+                    .map(
+                        (item, index) =>
+                            `<div class="flex items-center justify-between p-3 border rounded-lg cursor-pointer client-item transition-colors" onclick="selectClient('${item.client}')"><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-500 w-8">#${index + 1}</span><span class="font-mono">${item.client}</span></div><span class="px-2 py-1 ${dashboardData.selectedClient === item.client ? "bg-blue-600 text-white" : "border border-gray-300 text-gray-700"} text-xs rounded">${item.count} queries</span></div>`,
+                    )
+                    .join("");
+            }
+            function updateBlockedDomainsList() {
+                const container = document.getElementById("blockedDomainsList");
+                container.innerHTML = dashboardData.blockedDomains
+                    .map(
+                        (item, index) =>
+                            `<div class="p-4 border border-red-200 rounded-lg bg-red-50 cursor-pointer blocked-domain transition-colors" onclick="openUnblockModal('${item.domain}')" title="Click to unblock this domain"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><i data-lucide="shield-off" class="h-4 w-4 text-red-600"></i><span class="font-medium text-red-900">${item.domain}</span></div><span class="px-2 py-1 bg-red-600 text-white text-xs rounded">${item.count}</span></div><p class="text-xs text-red-600 mt-1">Blocked ${item.count} times</p></div>`,
+                    )
+                    .join("");
+            }
+            function selectClient(client) {
+                fetchClientQueries(client, 1);
+            }
+            function updateClientDetails() {
+                const container = document.getElementById("clientDetails");
+                const titleElement =
+                    document.getElementById("clientDetailsTitle");
+                if (!dashboardData.selectedClient) {
+                    container.innerHTML = `<div class="text-center text-gray-500 py-8">Click on a client IP address to view their query history</div>`;
+                    titleElement.textContent =
+                        "Select a client to view details";
+                    return;
+                }
+                titleElement.textContent = `Queries from ${dashboardData.selectedClient}`;
+                container.innerHTML = `<div class="space-y-4"><div class="flex items-center gap-2"><input type="text" value="${dashboardData.selectedClient}" class="flex-1 px-3 py-2 border border-gray-300 rounded font-mono text-sm" onchange="selectClient(this.value)"><button onclick="selectClient(document.querySelector('#clientDetails input').value)" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"><i data-lucide="search" class="h-4 w-4"></i></button></div><div class="space-y-2 max-h-80 overflow-y-auto">${dashboardData.clientQueries.map((query) => `<div class="flex items-center justify-between p-2 border rounded text-sm"><div class="flex items-center gap-3"><span class="font-mono text-gray-500">${formatTimestamp(query.timestamp)}</span><span class="font-medium">${query.domain}</span></div><div class="flex items-center gap-2"><span class="px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded">${query.type}</span>${query.blocked === 1 ? '<span class="px-2 py-1 bg-red-600 text-white text-xs rounded">BLOCKED</span>' : ""}</div></div>`).join("")}</div><div class="flex justify-center gap-2"><button onclick="changePage(-1)" ${dashboardData.currentPage === 1 ? "disabled" : ""} class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50">Previous</button><span class="px-3 py-1 text-sm">Page ${dashboardData.currentPage}</span><button onclick="changePage(1)" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button></div></div>`;
+            }
+            function changePage(direction) {
+                const newPage = Math.max(
+                    1,
+                    dashboardData.currentPage + direction,
+                );
+                fetchClientQueries(dashboardData.selectedClient, newPage);
+            }
+            function updateLastUpdatedTime() {
+                const element = document.getElementById("lastUpdated");
+                if (dashboardData.lastUpdated) {
+                    element.textContent = `Last updated: ${dashboardData.lastUpdated.toLocaleTimeString()}`;
+                }
+            }
+            function setupAutoRefresh() {
+                if (refreshTimer) {
+                    clearInterval(refreshTimer);
+                    refreshTimer = null;
+                }
+                if (
+                    dashboardData.autoRefresh &&
+                    dashboardData.refreshInterval > 0
+                ) {
+                    refreshTimer = setInterval(
+                        fetchAllData,
+                        dashboardData.refreshInterval * 1000,
+                    );
+                }
+            }
+            function formatTimestamp(timestamp) {
+                return new Date(timestamp * 1000).toLocaleString();
+            }
+            function openUnblockModal(domain) {
+                document.getElementById("selectedDomain").textContent = domain;
+                document.getElementById("mikrotikCommand").textContent =
+                    generateMikroTikCommand(domain);
+                document.getElementById("unblockModal").classList.add("active");
+                lucide.createIcons();
+            }
+            function closeModal() {
+                document
+                    .getElementById("unblockModal")
+                    .classList.remove("active");
+            }
+            function generateMikroTikCommand(domain) {
+                return `/ip/dns/static add name="${domain}" type=FWD match-subdomain=yes`;
+            }
+            async function copyToClipboard() {
+                const command =
+                    document.getElementById("mikrotikCommand").textContent;
+                try {
+                    await navigator.clipboard.writeText(command);
+                    alert("Command copied to clipboard!");
+                } catch (err) {
+                    console.error("Failed to copy: ", err);
+                    const textArea = document.createElement("textarea");
+                    textArea.value = command;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    alert("Command copied to clipboard!");
+                }
+            }
+        </script>
     </body>
 </html>
