@@ -9,7 +9,7 @@
 
 A comprehensive DNS analytics solution that receives DNS logs from MikroTik routers via UDP, stores them in SQLite, and presents beautiful real-time statistics through a modern React dashboard.
 
-<img width="1920" alt="MikroTik DNS Analytics Dashboard" src="https://github.com/user-attachments/assets/5cc9de12-c36c-40c5-9e6c-907f4727a711" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/665bf83a-498f-4e35-97e7-41ef9c681e3f" />
 
 ---
 
