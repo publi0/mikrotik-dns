@@ -110,10 +110,11 @@ func serveAPI(db *sql.DB) {
 
 	mux.HandleFunc("/api/query-types", func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(`
-            SELECT type, COUNT(*)
+            SELECT type, COUNT(*) AS cnt
             FROM queries
             WHERE timestamp >= strftime('%s','now')-86400
-            GROUP BY type`)
+            GROUP BY type
+            ORDER BY cnt DESC`)
 		if err != nil {
 			http.Error(w, "DB error", http.StatusInternalServerError)
 			return

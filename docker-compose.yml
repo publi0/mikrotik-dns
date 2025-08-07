@@ -5,6 +5,10 @@ services:
     build: .
     ports:
       - "5354:5354/udp"
-      - "8080:8080/tcp"
     volumes:
-      - ./data:/data
+      - ./data:/app/data
+    networks:
+      - internal
+networks:
+  internal:
+    external: true
