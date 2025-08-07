@@ -8,11 +8,11 @@ services:
     expose:
       - "8080"
     volumes:
-      - ./data:/app/data
+      - ./data:/data
+    environment:
+      - DNS_SERVER=${DNS_SERVER:-}
     networks:
       - internal
-    environment:
-      - DATABASE_PATH=/app/data/queries.db
 
   mikrotik-dns-frontend:
     container_name: mikrotik-dns-frontend
