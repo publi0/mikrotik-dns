@@ -1,14 +1,34 @@
 services:
-  mikrotik-dns:
-    container_name: mikrotik-dns
+  mikrotik-dns-backend:
+    container_name: mikrotik-dns-backend
     restart: unless-stopped
     build: .
     ports:
       - "5354:5354/udp"
+    expose:
+      - "8080"
     volumes:
       - ./data:/app/data
     networks:
       - internal
+    environment:
+      - DATABASE_PATH=/app/data/queries.db
+
+  mikrotik-dns-frontend:
+    container_name: mikrotik-dns-frontend
+    restart: unless-stopped
+    build:
+      context: ./page
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+    environment:
+      - BACKEND_URL=http://mikrotik-dns-backend:8080
+    depends_on:
+      - mikrotik-dns-backend
+
 networks:
   internal:
     external: true

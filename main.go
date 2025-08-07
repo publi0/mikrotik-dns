@@ -24,8 +24,7 @@ func prepareDB(db *sql.DB) {
         timestamp INTEGER,
         client TEXT,
         domain TEXT,
-        type TEXT,
-        blocked INTEGER
+        type TEXT
     )`)
 }
 
@@ -63,16 +62,14 @@ func handleLine(db *sql.DB, line string) {
 		qtypeRaw = resolveUnknownType(line)
 	}
 
-	blocked := 0
 	if strings.HasPrefix(qtypeRaw, "UNKNOWN") {
 		log.Printf("Unknown type: [%s]", line)
-		blocked = 1
 	}
-	if _, err := db.Exec(`INSERT INTO queries(timestamp, client, domain, type, blocked) VALUES(?,?,?,?,?)`,
-		ts.Unix(), client, domain, qtypeRaw, blocked); err != nil {
+	if _, err := db.Exec(`INSERT INTO queries(timestamp, client, domain, type) VALUES(?,?,?,?)`,
+		ts.Unix(), client, domain, qtypeRaw); err != nil {
 		log.Printf("DB insert error: %v", err)
 	} else {
-		log.Printf("Logged query: %s %s %s blocked=%d", client, domain, qtypeRaw, blocked)
+		log.Printf("Logged query: %s %s %s", client, domain, qtypeRaw)
 	}
 }
 
@@ -84,6 +81,21 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		next.ServeHTTP(w, r)
+	})
+}
+
 func serveAPI(db *sql.DB) {
 	mux := http.NewServeMux()
 
@@ -91,7 +103,7 @@ func serveAPI(db *sql.DB) {
 		rows, err := db.Query(`
             SELECT domain, COUNT(*) as cnt
             FROM queries
-            WHERE blocked=0 AND timestamp >= strftime('%s','now')-86400
+            WHERE timestamp >= strftime('%s','now')-86400
             GROUP BY domain
             ORDER BY cnt DESC
             LIMIT 20`)
@@ -144,34 +156,6 @@ func serveAPI(db *sql.DB) {
 		json.NewEncoder(w).Encode(out)
 	})
 
-	mux.HandleFunc("/api/blocked-domains", func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.Query(`
-            SELECT domain, COUNT(*) as cnt
-            FROM queries
-            WHERE blocked=1 AND timestamp >= strftime('%s','now')-86400
-            GROUP BY domain
-            ORDER BY cnt DESC
-            LIMIT 20`)
-		if err != nil {
-			http.Error(w, "DB error", http.StatusInternalServerError)
-			return
-		}
-		defer rows.Close()
-		var out []struct {
-			Domain string `json:"domain"`
-			Count  int    `json:"count"`
-		}
-		for rows.Next() {
-			var d string
-			var c int
-			rows.Scan(&d, &c)
-			out = append(out, struct {
-				Domain string `json:"domain"`
-				Count  int    `json:"count"`
-			}{d, c})
-		}
-		json.NewEncoder(w).Encode(out)
-	})
 
 	mux.HandleFunc("/api/clients", func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(`
@@ -202,6 +186,147 @@ func serveAPI(db *sql.DB) {
 		json.NewEncoder(w).Encode(out)
 	})
 
+	mux.HandleFunc("/api/unique-clients-count", func(w http.ResponseWriter, r *http.Request) {
+		var count int
+		err := db.QueryRow(`
+        SELECT COUNT(DISTINCT client)
+        FROM queries
+        WHERE timestamp >= strftime('%s','now')-86400`).Scan(&count)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(struct {
+			Count int `json:"count"`
+		}{count})
+	})
+
+	mux.HandleFunc("/api/unique-domains-count", func(w http.ResponseWriter, r *http.Request) {
+		var count int
+		err := db.QueryRow(`
+        SELECT COUNT(DISTINCT domain)
+        FROM queries
+        WHERE timestamp >= strftime('%s','now')-86400`).Scan(&count)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(struct {
+			Count int `json:"count"`
+		}{count})
+	})
+
+	mux.HandleFunc("/api/all-queries", func(w http.ResponseWriter, r *http.Request) {
+		page := 1
+		if p := r.URL.Query().Get("page"); p != "" {
+			if n, err := strconv.Atoi(p); err == nil && n > 0 {
+				page = n
+			}
+		}
+		pageSize := 20
+		if ps := r.URL.Query().Get("page_size"); ps != "" {
+			if n, err := strconv.Atoi(ps); err == nil && n > 0 {
+				pageSize = n
+			}
+		}
+		offset := (page - 1) * pageSize
+
+		rows, err := db.Query(`
+        SELECT timestamp, client, domain, type
+        FROM queries
+        ORDER BY timestamp DESC
+        LIMIT ? OFFSET ?`, pageSize, offset)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		var out []struct {
+			Timestamp int64  `json:"timestamp"`
+			Client    string `json:"client"`
+			Domain    string `json:"domain"`
+			Type      string `json:"type"`
+		}
+		for rows.Next() {
+			var ts int64
+			var c, d, t string
+			rows.Scan(&ts, &c, &d, &t)
+			out = append(out, struct {
+				Timestamp int64  `json:"timestamp"`
+				Client    string `json:"client"`
+				Domain    string `json:"domain"`
+				Type      string `json:"type"`
+			}{ts, c, d, t})
+		}
+		json.NewEncoder(w).Encode(out)
+	})
+
+	mux.HandleFunc("/api/domain-queries", func(w http.ResponseWriter, r *http.Request) {
+		domain := r.URL.Query().Get("domain")
+		if domain == "" {
+			http.Error(w, "domain query param required", http.StatusBadRequest)
+			return
+		}
+		partial := r.URL.Query().Get("partial") == "true"
+		page := 1
+		if p := r.URL.Query().Get("page"); p != "" {
+			if n, err := strconv.Atoi(p); err == nil && n > 0 {
+				page = n
+			}
+		}
+		pageSize := 20
+		if ps := r.URL.Query().Get("page_size"); ps != "" {
+			if n, err := strconv.Atoi(ps); err == nil && n > 0 {
+				pageSize = n
+			}
+		}
+		offset := (page - 1) * pageSize
+
+		var rows *sql.Rows
+		var err error
+		if partial {
+			likePattern := "%" + domain + "%"
+			rows, err = db.Query(`
+        SELECT timestamp, client, domain, type
+        FROM queries
+        WHERE domain LIKE ? AND timestamp >= strftime('%s','now')-86400
+        ORDER BY timestamp DESC
+        LIMIT ? OFFSET ?`, likePattern, pageSize, offset)
+		} else {
+			rows, err = db.Query(`
+        SELECT timestamp, client, domain, type
+        FROM queries
+        WHERE domain = ? AND timestamp >= strftime('%s','now')-86400
+        ORDER BY timestamp DESC
+        LIMIT ? OFFSET ?`, domain, pageSize, offset)
+		}
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		var out []struct {
+			Timestamp int64  `json:"timestamp"`
+			Client    string `json:"client"`
+			Domain    string `json:"domain"`
+			Type      string `json:"type"`
+		}
+		for rows.Next() {
+			var ts int64
+			var c, d, t string
+			rows.Scan(&ts, &c, &d, &t)
+			out = append(out, struct {
+				Timestamp int64  `json:"timestamp"`
+				Client    string `json:"client"`
+				Domain    string `json:"domain"`
+				Type      string `json:"type"`
+			}{ts, c, d, t})
+		}
+		json.NewEncoder(w).Encode(out)
+	})
+
 	mux.HandleFunc("/api/client-queries", func(w http.ResponseWriter, r *http.Request) {
 		client := r.URL.Query().Get("client")
 		if client == "" {
@@ -223,7 +348,7 @@ func serveAPI(db *sql.DB) {
 		offset := (page - 1) * pageSize
 
 		rows, err := db.Query(`
-            SELECT timestamp, domain, type, blocked
+            SELECT timestamp, domain, type
             FROM queries
             WHERE client = ? AND timestamp >= strftime('%s','now')-86400
             ORDER BY timestamp DESC
@@ -238,28 +363,25 @@ func serveAPI(db *sql.DB) {
 			Timestamp int64  `json:"timestamp"`
 			Domain    string `json:"domain"`
 			Type      string `json:"type"`
-			Blocked   int    `json:"blocked"`
 		}
 		for rows.Next() {
 			var ts int64
 			var d, t string
-			var b int
-			rows.Scan(&ts, &d, &t, &b)
+			rows.Scan(&ts, &d, &t)
 			out = append(out, struct {
 				Timestamp int64  `json:"timestamp"`
 				Domain    string `json:"domain"`
 				Type      string `json:"type"`
-				Blocked   int    `json:"blocked"`
-			}{ts, d, t, b})
+			}{ts, d, t})
 		}
 		json.NewEncoder(w).Encode(out)
 	})
 
-	mux.Handle("/", http.FileServer(http.Dir("./page")))
+	// Serve API endpoints only - frontend runs on separate server
 
-	loggedMux := loggingMiddleware(mux)
+	corsAndLoggedMux := corsMiddleware(loggingMiddleware(mux))
 	log.Println("Starting HTTP server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", loggedMux))
+	log.Fatal(http.ListenAndServe(":8080", corsAndLoggedMux))
 }
 
 func main() {

@@ -1,20 +1,22 @@
-# Mikrotik Dns Dashboard
+# MikroTik DNS Analytics
 
-A lightweight self-hosted dashboard for visualizing DNS queries from your MikroTik router.
-It receives DNS query logs via UDP from a MikroTik device and stores/analyzes them using SQLite, exposing a web dashboard with statistics via a web interface.
+Sistema de análise de logs DNS do MikroTik com dashboard web interativo e moderno.
+Recebe logs DNS via UDP, armazena em SQLite e apresenta estatísticas através de uma interface web React/Next.js.
 
 <img width="1920" height="1213" alt="image" src="https://github.com/user-attachments/assets/5cc9de12-c36c-40c5-9e6c-907f4727a711" />
 
 ---
 
-## Features
+## ✨ Recursos
 
-- Collects DNS query logs from MikroTik via UDP
-- Stores logs in a local SQLite database
-- Exposes REST API for dashboard and statistics
-- Simple web interface (served at `/`)
-- View top queried domains, query types, blocked queries, and per-client stats
-- All code and dashboard are containerized (Docker/Alpine, no dependencies on host)
+- **Dashboard em Tempo Real**: Visualização de estatísticas DNS com atualização automática a cada 5 segundos
+- **Interface Moderna**: Dashboard Next.js 15 + React 19 com Tailwind CSS e componentes Radix UI
+- **Backend Otimizado**: API Go com SQLite, CORS configurado e logging detalhado
+- **Análise Completa**: Top domínios, tipos de queries, clientes ativos e histórico de queries
+- **Deploy Docker**: Containerização completa com Docker Compose para produção
+- **Desenvolvimento**: Makefile com comandos para desenvolvimento local e produção
+- **Auto-refresh**: Interface atualiza automaticamente (configurável de 5s a 5min)
+- **Responsivo**: Funciona perfeitamente em desktop e mobile
 
 ---
 
@@ -26,27 +28,41 @@ It receives DNS query logs via UDP from a MikroTik device and stores/analyzes th
 
 ---
 
-## Quick Start (Docker Compose)
+## 🚀 Deploy Rápido (Recomendado)
 
-Clone this repository:
+### 1. Usando Makefile (Mais Fácil)
 
-```sh
-git clone https://github.com/yourusername/mikrotik-dns-dashboard.git
-cd mikrotik-dns-dashboard
+```bash
+# Verificar se todas as ferramentas estão disponíveis
+make check-tools
+
+# Construir e iniciar todos os serviços
+make docker-build
+make docker-up
+
+# Verificar logs em tempo real
+make docker-logs
+
+# Parar todos os serviços
+make docker-down
 ```
 
-**Build and run:**
+### 2. Docker Compose Direto
 
-```sh
-docker compose up --build
+```bash
+# Construir e iniciar
+docker compose up -d --build
+
+# Verificar logs
+docker compose logs -f
+
+# Parar
+docker compose down
 ```
 
-This will:
-
-- Build the Go binary with SQLite support (CGO enabled)
-- Run the HTTP server on port `8080`
-- Listen for UDP log input on port `5354`
-- Persist the SQLite database in the `/data` directory inside the container
+**Após iniciar os serviços:**
+- **Frontend**: http://localhost:3000 (Dashboard moderno)
+- **Backend API**: http://localhost:8080/api/ (API REST)
 
 ---
 

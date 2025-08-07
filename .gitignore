@@ -1,2 +1,55 @@
-dnslogs.db*
+# Compiled binaries
 mikrotik-dns
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Database files
+dnslogs.db*
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Data directory
+data/
+logs/
+
+# Go build artifacts
+vendor/
+*.test
+*.prof
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Next.js frontend
+page/.next/
+page/out/
+page/build/
+page/dist/
+page/node_modules/
+page/.env*
+page/*.log
+
+# Docker
+*.pid
+docker-compose.override.yml
