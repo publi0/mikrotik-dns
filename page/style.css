@@ -262,3 +262,99 @@ html {
         animation-delay: 0s;
     }
 }
+
+/* Custom colors for DNS types */
+.dns-type-a {
+    background-color: #f59e42; /* orange-500 */
+    color: white;
+}
+
+.dns-type-aaaa {
+    background-color: #22c55e; /* green-500 */
+    color: white;
+}
+
+.dns-type-unknown {
+    background-color: #ef4444; /* red-500 */
+    color: white;
+}
+
+.dns-type-cname {
+    background-color: #3b82f6; /* blue-500 */
+    color: white;
+}
+
+.dns-type-mx {
+    background-color: #8b5cf6; /* violet-500 */
+    color: white;
+}
+
+.dns-type-ns {
+    background-color: #ec4899; /* pink-500 */
+    color: white;
+}
+
+.dns-type-ptr {
+    background-color: #14b8a6; /* teal-500 */
+    color: white;
+}
+
+.dns-type-soa {
+    background-color: #f97316; /* orange-600 */
+    color: white;
+}
+
+.dns-type-srv {
+    background-color: #6366f1; /* indigo-500 */
+    color: white;
+}
+
+.dns-type-txt {
+    background-color: #84cc16; /* lime-500 */
+    color: white;
+}
+
+.dns-type-other {
+    background-color: #6b7280; /* gray-500 */
+    color: white;
+}
+
+.dns-type-caa {
+    background-color: #f43f5e; /* rose-500 */
+    color: white;
+}
+
+.dns-type-ds,
+.dns-type-dnskey,
+.dns-type-rrsig,
+.dns-type-nsec {
+    background-color: #d946ef; /* fuchsia-500 */
+    color: white;
+}
+
+.dns-type-tlsa {
+    background-color: #0ea5e9; /* sky-500 */
+    color: white;
+}
+
+.dns-type-sshfp {
+    background-color: #fde047; /* yellow-300 */
+    color: black;
+}
+
+.dns-type-naptr {
+    background-color: #a855f7; /* purple-500 */
+    color: white;
+}
+
+.dns-type-svcb,
+.dns-type-https {
+    background-color: #10b981; /* emerald-500 */
+    color: white;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

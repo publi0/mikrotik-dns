@@ -216,6 +216,33 @@ function animateCounter(elementId, targetValue, suffix = "") {
   }, 50);
 }
 
+function getDnsTypeClass(type) {
+  const typeLower = type.toLowerCase();
+  const classMap = {
+    a: "dns-type-a",
+    aaaa: "dns-type-aaaa",
+    cname: "dns-type-cname",
+    mx: "dns-type-mx",
+    ns: "dns-type-ns",
+    ptr: "dns-type-ptr",
+    soa: "dns-type-soa",
+    srv: "dns-type-srv",
+    txt: "dns-type-txt",
+    unknown: "dns-type-unknown",
+    caa: "dns-type-caa",
+    ds: "dns-type-ds",
+    dnskey: "dns-type-dnskey",
+    rrsig: "dns-type-rrsig",
+    nsec: "dns-type-nsec",
+    tlsa: "dns-type-tlsa",
+    sshfp: "dns-type-sshfp",
+    naptr: "dns-type-naptr",
+    svcb: "dns-type-svcb",
+    https: "dns-type-https",
+  };
+  return classMap[typeLower] || "dns-type-other";
+}
+
 function updateQueryTypesChart() {
   const container = document.getElementById("queryTypesChart");
   const totalQueries = dashboardData.queryTypes.reduce(
@@ -224,26 +251,13 @@ function updateQueryTypesChart() {
   );
   container.innerHTML = dashboardData.queryTypes
     .map((item) => {
-      let color;
-      let bgColor;
-      if (item.type === "AAAA") {
-        color = "#22c55e"; // green-500
-        bgColor = "bg-green-600";
-      } else if (item.type === "A") {
-        color = "#f59e42"; // orange-500
-        bgColor = "bg-orange-500";
-      } else if (item.type === "UNKNOWN") {
-        color = "#ef4444"; // red-500
-        bgColor = "bg-red-600";
-      } else {
-        color = "#818cf8"; // indigo-400 (default)
-        bgColor = "bg-indigo-600";
-      }
       const percentage =
         totalQueries > 0 ? ((item.count / totalQueries) * 100).toFixed(1) : "0";
+      const typeClass = getDnsTypeClass(item.type);
+
       return `<div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-4 h-4 rounded" style="background-color: ${color}"></div>
+          <div class="w-4 h-4 rounded ${typeClass}"></div>
           <span class="font-medium text-white">${item.type}</span>
         </div>
         <div class="text-right">
@@ -262,7 +276,7 @@ function updateTopDomainsOverview() {
     .slice(0, 10)
     .map(
       (item, index) =>
-        `<div class="flex items-center justify-between p-2 rounded hover-card ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.1}s"` : ""}><div class="flex items-center gap-3"><span class="text-sm font-mono text-gray-400">#${index + 1}</span><span class="font-medium text-white">${item.domain}</span></div><span class="px-2 py-1 bg-gray-700 text-gray-200 text-xs rounded">${item.count}</span></div>`,
+        `<div class="flex items-center justify-between p-2 rounded hover-card ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.1}s"` : ""}><div class="flex items-center gap-3 min-w-0"><span class="text-sm font-mono text-gray-400">#${index + 1}</span><span class="font-medium text-white truncate" title="${item.domain}">${item.domain}</span></div><span class="px-2 py-1 bg-gray-700 text-gray-200 text-xs rounded flex-shrink-0">${item.count}</span></div>`,
     )
     .join("");
 
@@ -352,25 +366,12 @@ function updateClientDetails() {
   }
   titleElement.textContent = `Queries from ${dashboardData.selectedClient}`;
   const useStagger = dashboardData.isInitialLoad;
-  container.innerHTML = `<div class="space-y-4"><div class="flex items-center gap-2"><input type="text" value="${dashboardData.selectedClient}" class="flex-1 px-3 py-2 border border-gray-600 rounded font-mono text-sm bg-gray-700 text-white" onchange="selectClient(this.value)"><button onclick="selectClient(document.querySelector('#clientDetails input').value)" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transform hover:scale-105 transition-all duration-200"><i data-lucide="search" class="h-4 w-4"></i></button></div><div class="space-y-2 max-h-80 overflow-y-auto">${dashboardData.clientQueries
+  container.innerHTML = `<div class="space-y-4"><div class="flex items-center gap-2"><input type="text" value="${dashboardData.selectedClient}" class="flex-1 px-3 py-2 border border-gray-600 rounded font-mono text-sm bg-gray-700 text-white" onchange="selectClient(this.value)"><button onclick="selectClient(document.querySelector('#clientDetails input').value)" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transform hover:scale-105 transition-all duration-200"><i data-lucide="search" class="h-4 w-4"></i></button></div><div class="space-y-2">${dashboardData.clientQueries
     .map(
       (
         query,
         index,
-      ) => `<div class="flex items-center justify-between p-2 border border-gray-700 rounded text-sm hover:shadow-sm transition-all duration-200 ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.02}s"` : ""}><div class="flex items-center gap-3"><span class="font-mono text-gray-400">${formatTimestamp(query.timestamp)}</span><span class="font-medium text-white">${query.domain}</span></div><div class="flex items-center gap-2"><span class="px-2 py-1 text-xs rounded font-mono"
-    style="
-      background-color: ${
-        query.type === "AAAA"
-          ? "#22c55e"
-          : query.type === "A"
-            ? "#f59e42"
-            : query.type === "UNKNOWN"
-              ? "#ef4444"
-              : "#6366f1"
-      };
-      color: white;
-    "
-  >
+      ) => `<div class="flex items-center justify-between p-2 border border-gray-700 rounded text-sm hover:shadow-sm transition-all duration-200 ${useStagger ? "stagger-item" : ""}" ${useStagger ? `style="animation-delay: ${index * 0.02}s"` : ""}><div class="flex items-center gap-3"><span class="font-mono text-gray-400">${formatTimestamp(query.timestamp)}</span><span class="font-medium text-white">${query.domain}</span></div><div class="flex items-center gap-2"><span class="px-2 py-1 text-xs rounded font-mono ${getDnsTypeClass(query.type)}">
     ${query.type}
   </span>
 ${query.blocked === 1 ? '<span class="px-2 py-1 bg-red-500 text-white text-xs rounded">BLOCKED</span>' : ""}</div></div>`,

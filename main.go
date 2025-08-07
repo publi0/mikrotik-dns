@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net"
 	"net/http"
@@ -55,16 +56,23 @@ func handleLine(db *sql.DB, line string) {
 	client := m[2]
 	domain := m[3]
 	qtypeRaw := m[4]
-	qtype := strings.Fields(qtypeRaw)[0]
+
+	if qtypeRaw == "" {
+		qtypeRaw = "UNKNOWN"
+	} else if strings.HasPrefix(qtypeRaw, "UNKNOWN") {
+		qtypeRaw = resolveUnknownType(line)
+	}
+
 	blocked := 0
 	if strings.HasPrefix(qtypeRaw, "UNKNOWN") {
+		log.Printf("Unknown type: [%s]", line)
 		blocked = 1
 	}
 	if _, err := db.Exec(`INSERT INTO queries(timestamp, client, domain, type, blocked) VALUES(?,?,?,?,?)`,
-		ts.Unix(), client, domain, qtype, blocked); err != nil {
+		ts.Unix(), client, domain, qtypeRaw, blocked); err != nil {
 		log.Printf("DB insert error: %v", err)
 	} else {
-		log.Printf("Logged query: %s %s %s blocked=%d", client, domain, qtype, blocked)
+		log.Printf("Logged query: %s %s %s blocked=%d", client, domain, qtypeRaw, blocked)
 	}
 }
 
@@ -292,4 +300,43 @@ func main() {
 	}()
 
 	serveAPI(db)
+}
+
+func resolveUnknownType(qtypeRaw string) string {
+	num, err := extractDNSTypeNumber(qtypeRaw)
+	if err != nil {
+		return "UNKNOWN"
+	}
+	return getDNSTypeName(num)
+}
+
+func extractDNSTypeNumber(qtypeRaw string) (int, error) {
+	start := strings.Index(qtypeRaw, "(")
+	end := strings.Index(qtypeRaw, ")")
+
+	if start == -1 || end == -1 || start >= end-1 {
+		return 0, errors.New("invalid DNS type format")
+	}
+
+	numStr := qtypeRaw[start+1 : end]
+	num, err := strconv.Atoi(numStr)
+	if err != nil {
+		return 0, errors.New("invalid DNS type number")
+	}
+
+	return num, nil
+}
+
+func getDNSTypeName(typeNum int) string {
+	dnsTypes := map[int]string{
+		1: "A", 2: "NS", 5: "CNAME", 6: "SOA", 12: "PTR", 15: "MX", 16: "TXT", 28: "AAAA",
+		33: "SRV", 35: "NAPTR", 39: "DNAME", 41: "OPT", 43: "DS", 46: "RRSIG", 47: "NSEC",
+		48: "DNSKEY", 50: "NSEC3", 51: "NSEC3PARAM", 52: "TLSA", 53: "SMIMEA", 55: "HIP",
+		59: "CDS", 60: "CDNSKEY", 61: "OPENPGPKEY", 62: "CSYNC", 63: "ZONEMD", 64: "SVCB",
+		65: "HTTPS", 99: "SPF", 108: "EUI48", 109: "EUI64", 257: "CAA",
+	}
+	if name, ok := dnsTypes[typeNum]; ok {
+		return name
+	}
+	return "UNKNOWN"
 }
