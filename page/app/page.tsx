@@ -105,6 +105,7 @@ export default function DNSDashboard() {
   const [selectedDomain, setSelectedDomain] = useState("");
   const [domainClients, setDomainClients] = useState<DomainClient[]>([]);
   const [domainPage, setDomainPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const fetchData = async () => {
     const apiUrl = "";
@@ -473,7 +474,11 @@ export default function DNSDashboard() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="domains">Domains</TabsTrigger>
@@ -571,16 +576,20 @@ export default function DNSDashboard() {
                         return (
                           <div
                             key={item.domain}
-                            className={`p-4 rounded-xl border transition-all duration-300 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-slate-900/20 ${
+                            className={`p-4 rounded-xl border transition-all duration-300 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-slate-900/20 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:-translate-y-0.5 ${
                               isTopThree
-                                ? "bg-gradient-to-r from-slate-50 via-blue-50 to-transparent dark:from-slate-800/50 dark:via-blue-900/30 dark:to-transparent border-blue-200/60 dark:border-blue-700/50 shadow-sm"
+                                ? "bg-gradient-to-r from-slate-50 via-blue-50 to-transparent dark:from-slate-800/50 dark:via-blue-900/30 dark:to-transparent border-blue-200/60 dark:border-blue-700/50 shadow-sm hover:shadow-lg hover:shadow-blue-100/50 dark:hover:shadow-blue-900/20"
                                 : "border-border hover:border-border/60 dark:hover:border-slate-600/50 bg-card hover:bg-accent/30"
                             }`}
+                            onClick={() => {
+                              setSelectedDomain(item.domain);
+                              setActiveTab("domains");
+                            }}
                           >
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <span
-                                  className={`text-xs font-bold w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${
+                                  className={`text-xs font-bold w-8 h-8 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0 ${
                                     isTopThree
                                       ? "bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-500 text-white"
                                       : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
@@ -588,16 +597,18 @@ export default function DNSDashboard() {
                                 >
                                   {index + 1}
                                 </span>
-                                <span
-                                  className="font-semibold truncate text-sm text-slate-900 dark:text-slate-100"
-                                  title={item.domain}
-                                >
-                                  {item.domain}
-                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <span
+                                    className="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate block"
+                                    title={item.domain}
+                                  >
+                                    {item.domain}
+                                  </span>
+                                </div>
                               </div>
                               <Badge
                                 variant={isTopThree ? "default" : "secondary"}
-                                className={`text-xs font-medium ${
+                                className={`text-xs font-medium ml-2 flex-shrink-0 ${
                                   isTopThree
                                     ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
                                     : ""
