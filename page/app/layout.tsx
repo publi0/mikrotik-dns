@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ html {
       <body className="min-h-screen bg-background text-foreground antialiased">
         <ThemeProvider defaultTheme="light" storageKey="mikrotik-dns-theme">
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

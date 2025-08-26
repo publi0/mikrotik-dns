@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { AnimatedNumber } from "@/components/animated-number";
 import { DarkModeSwitch } from "@/components/dark-mode-switch";
+import { useToast } from "@/hooks/use-toast";
 
 interface DomainData {
   domain: string;
@@ -87,6 +88,7 @@ interface DomainWithResolution {
 }
 
 export default function DNSDashboard() {
+  const { toast } = useToast();
   const [topDomains, setTopDomains] = useState<DomainData[]>([]);
   const [queryTypes, setQueryTypes] = useState<QueryTypeData[]>([]);
   const [clients, setClients] = useState<ClientData[]>([]);
@@ -238,6 +240,10 @@ export default function DNSDashboard() {
       // Try modern Clipboard API first (works on HTTPS, localhost, 127.0.0.1)
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
+        toast({
+          title: "Copied to clipboard",
+          description: text,
+        });
         return;
       }
 
@@ -252,14 +258,25 @@ export default function DNSDashboard() {
       textArea.select();
 
       try {
-        document.execCommand("copy");
+        const result = document.execCommand("copy");
+        if (result) {
+          toast({
+            title: "Copied to clipboard",
+            description: text,
+          });
+        } else {
+          throw new Error("execCommand failed");
+        }
       } finally {
         document.body.removeChild(textArea);
       }
     } catch (err) {
       console.error("Failed to copy text: ", err);
-      // Optional: Show user-friendly message
-      alert(`Failed to copy: ${text}\nPlease copy manually.`);
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy to clipboard",
+        variant: "destructive",
+      });
     }
   };
 
