@@ -13,6 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Activity,
   Users,
   Globe,
@@ -362,20 +369,28 @@ export default function DNSDashboard() {
 
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3 text-muted-foreground" />
-                  <select
-                    value={refreshInterval}
-                    onChange={(e) => setRefreshInterval(Number(e.target.value))}
+                  <Select
+                    value={refreshInterval.toString()}
+                    onValueChange={(value) => setRefreshInterval(Number(value))}
                     disabled={!autoRefresh}
-                    className={`bg-transparent border-none outline-none text-xs font-medium ${
-                      autoRefresh ? "text-foreground" : "text-muted-foreground"
-                    }`}
                   >
-                    <option value={5}>5s</option>
-                    <option value={10}>10s</option>
-                    <option value={30}>30s</option>
-                    <option value={60}>1m</option>
-                    <option value={300}>5m</option>
-                  </select>
+                    <SelectTrigger
+                      className={`w-16 h-6 border-none bg-transparent text-xs font-medium ${
+                        autoRefresh
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5s</SelectItem>
+                      <SelectItem value="10">10s</SelectItem>
+                      <SelectItem value="30">30s</SelectItem>
+                      <SelectItem value="60">1m</SelectItem>
+                      <SelectItem value="300">5m</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {autoRefresh && (
