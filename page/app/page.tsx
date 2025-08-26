@@ -228,9 +228,31 @@ export default function DNSDashboard() {
 
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      // Try modern Clipboard API first (works on HTTPS, localhost, 127.0.0.1)
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      // Fallback for non-HTTPS environments
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand("copy");
+      } finally {
+        document.body.removeChild(textArea);
+      }
     } catch (err) {
       console.error("Failed to copy text: ", err);
+      // Optional: Show user-friendly message
+      alert(`Failed to copy: ${text}\nPlease copy manually.`);
     }
   };
 
