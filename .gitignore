@@ -26,6 +26,7 @@ vendor/
 .idea/
 *.swp
 *.swo
+.zed/
 
 # OS files
 .DS_Store
