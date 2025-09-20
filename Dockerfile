@@ -19,7 +19,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 # Build with CGO enabled for SQLite
-ENV CGO_ENABLED=1 GOOS=linux GOARCH=amd64
+ENV CGO_ENABLED=1 GOOS=linux
 RUN go build -o /out/mikrotik-dns ./main.go
 
 # ---------- Runtime ----------
