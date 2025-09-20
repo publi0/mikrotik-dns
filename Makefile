@@ -1,4 +1,4 @@
-# MikroTik DNS Analytics - Build and Deployment Commands
+# MikroTik DNS Analytics - Single Image Deployment Commands
 
 .PHONY: help backend frontend dev clean install build run
 
@@ -6,32 +6,30 @@
 help:
 	@echo "MikroTik DNS Analytics - Available Commands:"
 	@echo ""
+	@echo "🔥 Single Image Commands (Primary):"
+	@echo "  make build            - Build single Docker image"
+	@echo "  make up               - Start with Docker Compose"
+	@echo "  make down             - Stop Docker Compose services"
+	@echo "  make logs             - Show container logs"
+	@echo "  make run              - Run single Docker image directly"
+	@echo "  make stop             - Stop single Docker container"
+	@echo "  make restart          - Restart services"
+	@echo ""
 	@echo "🔧 Development Commands:"
 	@echo "  make dev              - Show instructions to run development environment"
 	@echo "  make dev-full         - Start both backend and frontend (backend in background)"
 	@echo "  make dev-backend      - Start backend in development mode (port 8080)"
 	@echo "  make dev-frontend     - Start frontend in development mode (port 3000)"
 	@echo ""
-	@echo "🏗️  Build Commands:"
-	@echo "  make build            - Build both backend and frontend for production"
+	@echo "🏗️  Local Build Commands:"
 	@echo "  make build-backend    - Build backend binary"
 	@echo "  make build-frontend   - Build frontend for production"
-	@echo ""
-	@echo "🚀 Deploy Commands:"
-	@echo "  make run              - Run backend (requires build-backend first)"
-	@echo "  make run-backend      - Build and run backend"
-	@echo "  make run-frontend     - Build and run frontend production server"
-	@echo ""
-	@echo "🐳 Docker Commands:"
-	@echo "  make docker-build     - Build Docker images for both services"
-	@echo "  make docker-up        - Start all services with Docker Compose"
-	@echo "  make docker-down      - Stop all Docker services"
-	@echo "  make docker-logs      - Show logs from all Docker services"
+	@echo "  make build-local      - Build both backend and frontend locally"
 	@echo ""
 	@echo "🧹 Utility Commands:"
 	@echo "  make clean            - Clean build artifacts"
 	@echo "  make install          - Install frontend dependencies"
-	@echo "  make logs             - Show backend logs (if running)"
+	@echo "  make check-tools      - Check if required tools are installed"
 	@echo ""
 
 # Backend commands
@@ -67,8 +65,48 @@ run-frontend: build-frontend
 	cd page && npm start
 
 # Combined commands
-build: build-backend build-frontend
+build-local: build-backend build-frontend
 	@echo "✅ All components built successfully!"
+
+# Single image commands (Primary)
+build:
+	@echo "🔥 Building single Docker image..."
+	docker build -t ghcr.io/publi0/mikrotik-dns:dev .
+	@echo "✅ Single image built successfully!"
+
+up:
+	@echo "🔥 Starting with Docker Compose..."
+	docker compose up -d
+	@echo "✅ Services started!"
+	@echo "🌐 Web dashboard available at: http://localhost:3000"
+
+down:
+	@echo "🔥 Stopping Docker Compose services..."
+	docker compose down
+	@echo "✅ Services stopped!"
+
+logs:
+	@echo "🔥 Showing container logs..."
+	docker compose logs -f
+
+run:
+	@echo "🔥 Running single Docker image..."
+	docker run --rm -d \
+		--name mikrotik-dns-single \
+		-p 3000:3000 \
+		-p 5354:5354/udp \
+		-v $(PWD)/data:/data \
+		ghcr.io/publi0/mikrotik-dns:dev
+	@echo "✅ Container started!"
+	@echo "🌐 Web dashboard available at: http://localhost:3000"
+
+stop:
+	@echo "🔥 Stopping single Docker container..."
+	@docker stop mikrotik-dns-single 2>/dev/null || echo "ℹ️  Container not running"
+	@echo "✅ Container stopped!"
+
+restart: down up
+	@echo "✅ Services restarted!"
 
 dev:
 	@echo "🔧 Starting development environment..."
@@ -88,8 +126,6 @@ dev-full:
 	@echo "Starting frontend..."
 	@make dev-frontend
 
-run: run-backend
-
 # Utility commands
 clean:
 	@echo "🧹 Cleaning build artifacts..."
@@ -99,34 +135,12 @@ clean:
 	@rm -rf page/dist
 	@echo "✅ Clean complete!"
 
-logs:
-	@if [ -f backend.log ]; then tail -f backend.log; else echo "❌ Backend log not found. Is the backend running?"; fi
-
-stop:
-	@echo "⏹️  Stopping services..."
+dev-stop:
+	@echo "⏹️  Stopping development services..."
 	@if [ -f backend.pid ]; then kill `cat backend.pid` && rm backend.pid; echo "✅ Backend stopped"; else echo "ℹ️  Backend not running"; fi
 
-# Docker commands
-docker-build:
-	@echo "🐳 Building Docker images..."
-	docker compose build
-	@echo "✅ Docker images built successfully!"
-
-docker-up:
-	@echo "🐳 Starting services with Docker Compose..."
-	docker compose up -d
-	@echo "✅ Services started!"
-	@echo "🌐 Backend API available at: http://localhost:8080/api/"
-	@echo "🖥️  Frontend available at:   http://localhost:3000"
-
-docker-down:
-	@echo "🐳 Stopping Docker services..."
-	docker compose down
-	@echo "✅ Services stopped!"
-
-docker-logs:
-	@echo "🐳 Showing Docker logs..."
-	docker compose logs -f
+dev-logs:
+	@if [ -f backend.log ]; then tail -f backend.log; else echo "❌ Backend log not found. Is the backend running?"; fi
 
 # Check if required tools are installed
 check-tools:
