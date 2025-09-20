@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -12,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"context"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -314,13 +314,13 @@ func serveAPI(db *sql.DB) {
 				Type       string        `json:"type"`
 				Resolution DNSResolution `json:"resolution"`
 			}
-			
+
 			for rows.Next() {
 				var d, t string
 				rows.Scan(&d, &t)
-				
+
 				resolution := resolveDNS(d, t)
-				
+
 				domains = append(domains, struct {
 					Domain     string        `json:"domain"`
 					Type       string        `json:"type"`
@@ -518,7 +518,12 @@ func serveAPI(db *sql.DB) {
 }
 
 func main() {
-	db, err := sql.Open("sqlite3", "./data/dnslogs.db")
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "./data/dnslogs.db"
+	}
+
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -597,8 +602,8 @@ func getDNSTypeName(typeNum int) string {
 }
 
 type DNSResolution struct {
-	Status   string   `json:"status"`   // "success", "blocked", "error"
-	Records  []string `json:"records"`  // IP addresses, CNAME, etc
+	Status   string   `json:"status"`  // "success", "blocked", "error"
+	Records  []string `json:"records"` // IP addresses, CNAME, etc
 	Error    string   `json:"error,omitempty"`
 	Duration int64    `json:"duration"` // Resolution time in milliseconds
 }
@@ -705,9 +710,9 @@ func resolveDNS(domain string, queryType string) DNSResolution {
 	}
 
 	if err != nil {
-		if strings.Contains(err.Error(), "no such host") || 
-		   strings.Contains(err.Error(), "server misbehaving") ||
-		   strings.Contains(err.Error(), "connection refused") {
+		if strings.Contains(err.Error(), "no such host") ||
+			strings.Contains(err.Error(), "server misbehaving") ||
+			strings.Contains(err.Error(), "connection refused") {
 			result.Status = "blocked"
 			result.Error = err.Error()
 		} else {
@@ -725,7 +730,7 @@ func resolveDNS(domain string, queryType string) DNSResolution {
 		result.Status = "success"
 		result.Records = records
 	}
-	
+
 	result.Duration = time.Since(start).Milliseconds()
 	return result
 }

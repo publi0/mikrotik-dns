@@ -974,10 +974,16 @@ export default function DNSDashboard() {
                                 <td className="p-3 font-mono text-primary text-sm">
                                   <span
                                     className="cursor-pointer hover:text-primary/80 transition-colors"
-                                    title={`${client.client} (click to copy)`}
-                                    onClick={() =>
-                                      copyToClipboard(client.client)
-                                    }
+                                    title={`${client.client} (click to navigate, right-click to copy)`}
+                                    onClick={() => {
+                                      setSelectedClient(client.client);
+                                      setActiveTab("clients");
+                                      fetchClientQueries(client.client, 1);
+                                    }}
+                                    onContextMenu={(e) => {
+                                      e.preventDefault();
+                                      copyToClipboard(client.client);
+                                    }}
                                   >
                                     {client.client}
                                   </span>
@@ -1052,6 +1058,11 @@ export default function DNSDashboard() {
                         key={item.client}
                         className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
                         onClick={() => setSelectedClient(item.client)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          copyToClipboard(item.client);
+                        }}
+                        title={`${item.client} (click to select, right-click to copy)`}
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-mono text-slate-500 dark:text-slate-400 w-8">
@@ -1234,8 +1245,16 @@ export default function DNSDashboard() {
                           <td className="p-3 font-mono text-blue-600 dark:text-blue-400 text-xs">
                             <span
                               className="cursor-pointer hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                              title={`${query.client} (click to copy)`}
-                              onClick={() => copyToClipboard(query.client)}
+                              title={`${query.client} (click to navigate, right-click to copy)`}
+                              onClick={() => {
+                                setSelectedClient(query.client);
+                                setActiveTab("clients");
+                                fetchClientQueries(query.client, 1);
+                              }}
+                              onContextMenu={(e) => {
+                                e.preventDefault();
+                                copyToClipboard(query.client);
+                              }}
                             >
                               {query.client}
                             </span>

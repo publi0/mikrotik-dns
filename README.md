@@ -59,11 +59,34 @@ A comprehensive DNS analytics solution that receives DNS logs from MikroTik rout
 git clone https://github.com/publi0/mikrotik-dns.git
 cd mikrotik-dns
 
-# Start all services
-docker compose up -d --build
+# Start with Docker Compose
+docker compose up -d
 
 # View logs
 docker compose logs -f
+```
+
+### 2. Using Docker Run Directly
+
+```bash
+# Pull and run the pre-built image
+docker run -d \
+  --name mikrotik-dns \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -p 5354:5354/udp \
+  -v $(pwd)/data:/data \
+  ghcr.io/publi0/mikrotik-dns:latest
+
+# View logs
+docker logs -f mikrotik-dns
+```
+
+### 3. Using Deployment Script
+
+```bash
+# Use the provided deployment script
+./deploy-example.sh
 ```
 
 **Access the dashboard:**
@@ -71,21 +94,21 @@ docker compose logs -f
 - 🌐 **Web Dashboard**: http://localhost:3000
 - 📡 **UDP Logs**: Port 5354 (for MikroTik)
 
-### 2. Using Makefile
+### 4. Using Makefile
 
 ```bash
 # Check if all tools are available
 make check-tools
 
-# Build and start services
-make docker-build
-make docker-up
+# Build and start single image
+make single-build
+make single-up
 
 # View real-time logs
-make docker-logs
+make single-logs
 
 # Stop services
-make docker-down
+make single-down
 ```
 
 ---
@@ -122,19 +145,19 @@ Configure your MikroTik router to send DNS logs:
 
 ```mermaid
 graph LR
-    A[MikroTik Router] -->|UDP:5354| B[Go Backend]
+    A[MikroTik Router] -->|UDP:5354| B[Single Container]
     B -->|Store| C[SQLite DB]
-    B -->|API| D[Next.js Frontend]
-    D -->|Port 3000| E[User Browser]
+    B -->|Serve| D[User Browser]
 
     subgraph "Docker Container"
-        B
+        E[Go Backend :8080]
+        F[Next.js Frontend :3000]
         C
+        E --> F
     end
 
-    subgraph "Frontend Container"
-        D
-    end
+    B --> E
+    F -->|Port 3000| D
 ```
 
 ## 📊 API Endpoints
@@ -247,27 +270,41 @@ npm run build
 
 ## 📦 Docker Configuration
 
-### Single Port Deployment
+### Single Image Deployment
 
-The application now uses a single port (3000) with backend API proxying:
+The application is available as a single Docker image with both frontend and backend:
 
 ```yaml
+# docker-compose.yml
 services:
-  mikrotik-dns-backend:
-    build: .
-    expose:
-      - "8080" # Internal only
+  mikrotik-dns:
+    image: ghcr.io/publi0/mikrotik-dns:latest
+    container_name: mikrotik-dns
+    restart: unless-stopped
     ports:
+      - "3000:3000" # Web dashboard
       - "5354:5354/udp" # MikroTik logs
-
-  mikrotik-dns-frontend:
-    build:
-      context: ./page
-    ports:
-      - "3000:3000" # Public access
+    volumes:
+      - ./data:/data
     environment:
-      - BACKEND_URL=http://mikrotik-dns-backend:8080
+      - DNS_SERVER=${DNS_SERVER:-}
+      - DATABASE_PATH=/data/queries.db
+      - PORT=3000
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 ```
+
+### Environment Variables
+
+- `DATABASE_PATH`: SQLite database location (default: `/data/queries.db`)
+- `DNS_SERVER`: Custom DNS server for resolution testing (optional)
+- `PORT`: Frontend port (default: `3000`)
+- `NODE_ENV`: Node.js environment (default: `production`)
 
 ---
 

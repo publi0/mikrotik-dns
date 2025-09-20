@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+LICENSE
+
+# Development files
+.vscode
+.zed
+Makefile
+
+# Node.js
+page/node_modules
+page/.next
+page/frontend.log
+page/pnpm-lock.yaml
+
+# Go
+mikrotik-dns
+*.log
+
+# Data
+data/
+
+# Docker
+Dockerfile
+
+# GitHub
+.github
